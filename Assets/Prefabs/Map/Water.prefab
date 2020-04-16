@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8001505933087585419}
   - component: {fileID: 8001505933087585416}
   - component: {fileID: -2245003349770273588}
+  - component: {fileID: -5840447986149203151}
   m_Layer: 0
   m_Name: Water
   m_TagString: MAP_BACKGROUND
@@ -98,5 +99,32 @@ MonoBehaviour:
   Accessible_WaterUnit: 1
   Accessible_AirUnit: 1
   Accessible_Vehicule: 1
+  MovePossibleColor: {r: 0.056114297, g: 0.9150943, b: 0.8986094, a: 1}
   AttackBonus: 0
   DefenseBonus: 1
+--- !u!61 &-5840447986149203151
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8001505933087585417}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 2.18, y: 2.19}
+    newSize: {x: 2.18, y: 2.19}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 2.18, y: 2.19}
+  m_EdgeRadius: 0
