@@ -21,6 +21,10 @@ public class Tile : MonoBehaviour
     public bool Accessible_Vehicule;
     #endregion
 
+    #region Visual
+    public UnityEngine.Color MovePossibleColor;
+    #endregion
+
     #region Bonus
     /// <summary>
     /// Attack bonus applied when unit is on this tile
