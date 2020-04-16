@@ -31,7 +31,7 @@ public class Unit : MonoBehaviour
     /// <summary>
     /// Sprite render properties of this unit
     /// </summary>
-    private SpriteRenderer[] m_render;
+    private SpriteRenderer[] m_renders;
     /// <summary>
     /// Manager of the current game played
     /// </summary>
@@ -53,7 +53,7 @@ public class Unit : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        m_render = GetComponentsInChildren<SpriteRenderer>();
+        m_renders = GetComponentsInChildren<SpriteRenderer>();
         
         m_game = FindObjectOfType<Game>();
 
@@ -186,7 +186,7 @@ public class Unit : MonoBehaviour
 
     private void ChangeSpritesColor(UnityEngine.Color color)
     {
-        foreach (SpriteRenderer sprite in m_render)
+        foreach (SpriteRenderer sprite in m_renders)
         {
             sprite.color = color;
         }
