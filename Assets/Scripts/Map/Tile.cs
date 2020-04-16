@@ -21,6 +21,10 @@ public class Tile : MonoBehaviour
     public bool Accessible_Vehicule;
     #endregion
 
+    #region Visual
+    public UnityEngine.Color MovePossibleColor;
+    #endregion
+
     #region Bonus
     /// <summary>
     /// Attack bonus applied when unit is on this tile
@@ -35,7 +39,7 @@ public class Tile : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        transform.Translate(Vector2.down * 1);
+        
     }
 
     // Update is called once per frame
