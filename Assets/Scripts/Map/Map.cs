@@ -46,9 +46,32 @@ public class Map : MonoBehaviour
     }
     #endregion
 
+
+    #region Public Functions
+    public void DisplayAvailableMoves(Unit ai_unit)
+    {
+        // first dumb implement
+        List<Point> w_accessiblePositions = getPositionsWithin(ai_unit.getGridPosition(), 1);
+        
+        foreach(var w_point in w_accessiblePositions)
+        {
+            m_tileMap[w_point.X, w_point.Y].SetAvailableMove();
+        }
+
+    }
+    #endregion
+
+    #region UI Functions
     // Start is called before the first frame update
     public void Start()
     {
+        // check for UnityConstruction values
+        if (TileSize <= 0)
+        {
+            print("ERROR : TileSize <= 0");
+            throw new System.ArgumentOutOfRangeException("TileSize <= 0");
+        }
+
         // initialising tiles based on what's present on the scene
         m_tilesInitialized = InitialiseTiles();
         if(!m_tilesInitialized)
@@ -60,13 +83,12 @@ public class Map : MonoBehaviour
         m_unitsInitialized = InitialiseUnits();
     }
 
-
-
     // Update is called once per frame
     void Update()
     {
        
     }
+    #endregion
 
     #region Private Functions
     /// <summary>
@@ -133,6 +155,8 @@ public class Map : MonoBehaviour
             else
             {
                 m_tileMap[w_index.X, w_index.Y] = w_tile;
+                // store the position inside the tile
+                w_tile.setGridPosition(new Point(w_index.X, w_index.Y));
             }
         }
 
@@ -169,8 +193,6 @@ public class Map : MonoBehaviour
             w_listOfUnit.Add(w_unit);
             // setting unit position on the grid
             w_unit.setGridPosition( convertToGridPosition(w_unit.transform.position) );
-
-            //w_unit.transform.Translate(Vector2.down * 2);
         }
 
         return w_correctlyInitialized;
@@ -235,6 +257,32 @@ public class Map : MonoBehaviour
     bool isInBounds(Point ai_indexPosition)
     {
         return (ai_indexPosition.X >= 0 && ai_indexPosition.Y >= 0 && ai_indexPosition.X < m_size.X && ai_indexPosition.Y < m_size.Y);
+    }
+
+    /// <summary>
+    /// get a list of possition accessible of a given position with a provided range
+    /// </summary>
+    /// <param name="ai_basePosition">Position to start from</param>
+    /// <param name="ai_range">Range of access</param>
+    /// <returns></returns>
+    List<Point> getPositionsWithin(Point ai_basePosition, int ai_range)
+    {
+        List<Point> w_result = new List<Point>();
+
+        // DUMB IMPLEM
+        Point w_up = new Point(ai_basePosition.X, ai_basePosition.Y);
+        Point w_down = new Point(ai_basePosition.X, ai_basePosition.Y);
+        Point w_left = new Point(ai_basePosition.X, ai_basePosition.Y);
+        Point w_right = new Point(ai_basePosition.X, ai_basePosition.Y);
+        w_up.Y += 1; w_down.Y -= 1; w_left.X -= 1; w_right.X +=1;
+
+
+        if (isInBounds(w_up)) { w_result.Add(w_up); }
+        if (isInBounds(w_down)) { w_result.Add(w_down); }
+        if (isInBounds(w_left)) { w_result.Add(w_left); }
+        if (isInBounds(w_right)) { w_result.Add(w_right); }
+
+        return w_result;
     }
     #endregion
 }
