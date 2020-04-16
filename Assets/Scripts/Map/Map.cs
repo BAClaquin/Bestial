@@ -38,7 +38,7 @@ public class Map : MonoBehaviour
     #endregion
 
     #region Constructors
-    Map()
+    public Map()
     {
         m_tilesInitialized = false;
         m_unitsInitialized = false;
@@ -47,7 +47,7 @@ public class Map : MonoBehaviour
     #endregion
 
     // Start is called before the first frame update
-    void Start()
+    public void Start()
     {
         // initialising tiles based on what's present on the scene
         m_tilesInitialized = InitialiseTiles();
@@ -148,8 +148,6 @@ public class Map : MonoBehaviour
                 }
             }
         }
-
-        print("NOMBRE DE TUILES " + m_size);
 
         return w_correctlyInitialized;
     }
