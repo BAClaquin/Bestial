@@ -34,7 +34,7 @@ public class Map : MonoBehaviour
     /// <summary>
     /// Liste of units in the map
     /// </summary>
-    List<Unit> w_listOfUnit;
+    List<Unit> m_listOfUnits;
     #endregion
 
     #region Constructors
@@ -42,22 +42,48 @@ public class Map : MonoBehaviour
     {
         m_tilesInitialized = false;
         m_unitsInitialized = false;
-        w_listOfUnit = new List<Unit>();
+        m_listOfUnits = new List<Unit>();
     }
     #endregion
 
 
     #region Public Functions
+    /// <summary>
+    /// Display all available tiles where unit can move
+    /// </summary>
+    /// <param name="ai_unit">Unit you want to move</param>
     public void DisplayAvailableMoves(Unit ai_unit)
     {
         // first dumb implement
         List<Point> w_accessiblePositions = getPositionsWithin(ai_unit.getGridPosition(), 1);
-        
-        foreach(var w_point in w_accessiblePositions)
+
+        foreach (var w_point in w_accessiblePositions)
         {
             m_tileMap[w_point.X, w_point.Y].SetAvailableMove();
         }
+    }
 
+    /// <summary>
+    /// Resets tiles that where prevously set as possible move
+    /// </summary>
+    public void ResetAvailableMoves()
+    {
+        foreach(Tile w_tile in m_tileMap)
+        {
+            w_tile.ResetTileActions();
+        }
+    }
+
+    /// <summary>
+    /// Function to call on next turn
+    /// </summary>
+    public void ResetUnits()
+    {
+        // browse all units
+        foreach(Unit w_unit in m_listOfUnits)
+        {
+            w_unit.ResetAvailability();
+        }
     }
     #endregion
 
@@ -190,7 +216,7 @@ public class Map : MonoBehaviour
         foreach(Unit w_unit in w_units)
         {
             // adding unit to list
-            w_listOfUnit.Add(w_unit);
+            m_listOfUnits.Add(w_unit);
             // setting unit position on the grid
             w_unit.setGridPosition( convertToGridPosition(w_unit.transform.position) );
         }

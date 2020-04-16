@@ -17,6 +17,10 @@ public class Unit : MonoBehaviour
     /// Color of unit when selected
     /// </summary>
     public UnityEngine.Color HighlightedColor;
+    /// <summary>
+    /// Color of unit when disabled
+    /// </summary>
+    public UnityEngine.Color DisabledColor;
     #endregion
 
     #region Private Members
@@ -36,6 +40,10 @@ public class Unit : MonoBehaviour
     /// Indicates if unit has played during this run
     /// </summary>
     private bool m_hasMoved = false;
+    /// <summary>
+    /// When unit is disabled, no action is possible
+    /// </summary>
+    private bool m_disabled = false;
     #endregion
 
     #region Game tags
@@ -69,13 +77,44 @@ public class Unit : MonoBehaviour
     /// </summary>
     private void OnMouseDown()
     {
-        m_game.onSelectedUnit(this);
-        // highlight unit
-        Highlight();
+        // no events for disbaled units
+        if(! m_disabled)
+        {
+            m_game.onSelectedUnit(this);
+        }
+
+    }
+
+    /// <summary>
+    /// Visually highlights the unit
+    /// </summary>
+    public void Highlight()
+    {
+        m_render.color = HighlightedColor;
+    }
+
+    /// <summary>
+    /// Disable the unit
+    /// </summary>
+    public void Disable()
+    {
+        m_disabled = true;
+        m_render.color = DisabledColor;
     }
     #endregion
 
     #region Public Functions
+    /// <summary>
+    /// Resets availability of the unit
+    /// </summary>
+    public void ResetAvailability()
+    {
+        // reset played information
+        m_hasMoved = false;
+        m_disabled = false;
+        // reset to default visual effect
+        ResetVisualEffects();
+    }
     /// <summary>
     /// Sets the position of this unit on a 2D grid defined by a map
     /// </summary>
@@ -105,8 +144,10 @@ public class Unit : MonoBehaviour
         // storring position in grid
         m_gridPosition = ai_newPosition;
 
-        // desactive pour tests
-        //m_hasMoved = true;
+        // unit has conumes its move
+        m_hasMoved = true;
+
+        ResetVisualEffects();
     }
 
     /// <summary>
@@ -117,16 +158,23 @@ public class Unit : MonoBehaviour
     {
         return m_hasMoved;
     }
+
+    /// <summary>
+    /// To unselect an unit
+    /// </summary>
+    public void Unselect()
+    {
+        // if unit isnt disabled
+        if(!m_disabled)
+        {
+            // reset its visual effects
+            ResetVisualEffects();
+        }
+        // else nothing to do
+    }
     #endregion
 
     #region Private Functions
-    /// <summary>
-    /// Visually highlights the unit
-    /// </summary>
-    void Highlight()
-    {
-        m_render.color = HighlightedColor;
-    }
     /// <summary>
     /// Resets all visual effects on the unit
     /// </summary>
