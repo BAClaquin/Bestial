@@ -100,10 +100,25 @@ public class Tile : MonoBehaviour
         m_game.onSelectedTile(this);
     }
 
-    public void SetAvailableMove()
+    /// <summary>
+    /// Sets the tile as accessible
+    /// </summary>
+    public void SetAsAccessible()
     {
         m_tagMovePossible = true;
         m_render.color = MovePossibleColor;
+    }
+
+    /// <summary>
+    /// Indicates if this tile is accessible for this type of unit
+    /// Only cares about type, not range of the unit
+    /// </summary>
+    /// <param name="ai_unit">Unit you want to know if it has access to </param>
+    /// <returns>True if unit has acces to this type of tile, false otherwise</returns>
+    public bool isAccessibleForUnitType(Unit ai_unit)
+    {
+        print("Temporaire, non terminé");
+        return true;
     }
 
     /// <summary>

@@ -54,13 +54,13 @@ public class Map : MonoBehaviour
     /// <param name="ai_unit">Unit you want to move</param>
     public void DisplayAvailableMoves(Unit ai_unit)
     {
-        // first dumb implement
-        List<Point> w_accessiblePositions = getPositionsWithin(ai_unit.getGridPosition(), 1);
-
-        foreach (var w_point in w_accessiblePositions)
-        {
-            m_tileMap[w_point.X, w_point.Y].SetAvailableMove();
-        }
+        // the tile of the unit
+        List<Tile> w_unitTile = new List<Tile>();
+        w_unitTile.Add(m_tileMap[ai_unit.getGridPosition().X, ai_unit.getGridPosition().Y]);
+        // all accessible tiles
+        List<Tile> w_allTilesAccessible = new List<Tile>();
+        // compute and mark all accessible tiles for this unit
+        computeAccessibleTiles(ai_unit, ai_unit.Range, w_unitTile, w_allTilesAccessible);
     }
 
     /// <summary>
@@ -117,6 +117,55 @@ public class Map : MonoBehaviour
     #endregion
 
     #region Private Functions
+    /// <summary>
+    /// Computes all accessible tiles from a list of tiles and provides result in aio_globalAccessibleTiles
+    /// Warning : this function is recursive
+    /// </summary>
+    /// <param name="ai_unit">Unit for which you check accessibility</param>
+    /// <param name="ai_remainningRange">Range remaining for accesss computation</param>
+    /// <param name="ai_fromTiles">List of tiles you compute your accessibility from</param>
+    /// <param name="aio_globalAccessibleTiles">Result of all accessible tiles</param>
+    private void computeAccessibleTiles(Unit ai_unit, int ai_remainningRange, List<Tile> ai_fromTiles, List<Tile> aio_globalAccessibleTiles)
+    {
+        // if the range remaininfg is suffiscient to move
+        if (ai_remainningRange > 0)
+        {
+            // create a list of new tiles accessible
+            List<Tile> w_newAccessibleTiles = new List<Tile>();
+            // for all tiles to start from
+            foreach (Tile w_tile in ai_fromTiles)
+            {
+                // look for neighbours (with range of 1)
+                List<Point> w_neighbours = getPositionsWithin(w_tile.getGridPosition(), 1);
+                // for each of these new neighbours
+                foreach (Point w_neighbourPoint in w_neighbours)
+                {
+                    // is the tile is accessible for the provided type of unit
+                    // and the tile has not already been marked as accessible
+                    if (m_tileMap[w_neighbourPoint.X, w_neighbourPoint.Y].isAccessibleForUnitType(ai_unit) &&
+                        !m_tileMap[w_neighbourPoint.X, w_neighbourPoint.Y].isTaggedAccessible())
+                    {
+                        // we have a new accessible tile to add
+                        w_newAccessibleTiles.Add(m_tileMap[w_neighbourPoint.X, w_neighbourPoint.Y]);
+                        // once added, set it as available which will mark it as available
+                        m_tileMap[w_neighbourPoint.X, w_neighbourPoint.Y].SetAsAccessible();
+                    }
+                }
+            }
+
+            // adding all found new accessible tiles to all accessible tiles
+            aio_globalAccessibleTiles.AddRange(w_newAccessibleTiles);
+
+            // if remainning range to compute
+            if (ai_remainningRange > 1)
+            {
+                // compute again new accessible tiles from new tiles found as accessible
+                computeAccessibleTiles(ai_unit, ai_remainningRange - 1, w_newAccessibleTiles, aio_globalAccessibleTiles);
+            }
+        }
+        // here nothing to do end of function
+    }
+
     /// <summary>
     ///  Init map on tiles based on tiles existing on the scene
     /// </summary>
