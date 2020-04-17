@@ -34,7 +34,7 @@ public class Map : MonoBehaviour
     /// <summary>
     /// Liste of units in the map
     /// </summary>
-    List<Unit> w_listOfUnit;
+    List<Unit> m_listOfUnits;
     #endregion
 
     #region Constructors
@@ -42,22 +42,48 @@ public class Map : MonoBehaviour
     {
         m_tilesInitialized = false;
         m_unitsInitialized = false;
-        w_listOfUnit = new List<Unit>();
+        m_listOfUnits = new List<Unit>();
     }
     #endregion
 
 
     #region Public Functions
+    /// <summary>
+    /// Display all available tiles where unit can move
+    /// </summary>
+    /// <param name="ai_unit">Unit you want to move</param>
     public void DisplayAvailableMoves(Unit ai_unit)
     {
         // first dumb implement
         List<Point> w_accessiblePositions = getPositionsWithin(ai_unit.getGridPosition(), 1);
-        
-        foreach(var w_point in w_accessiblePositions)
+
+        foreach (var w_point in w_accessiblePositions)
         {
             m_tileMap[w_point.X, w_point.Y].SetAvailableMove();
         }
+    }
 
+    /// <summary>
+    /// Resets tiles that where prevously set as possible move
+    /// </summary>
+    public void ResetAvailableMoves()
+    {
+        foreach(Tile w_tile in m_tileMap)
+        {
+            w_tile.ResetTileActions();
+        }
+    }
+
+    /// <summary>
+    /// Function to call on next turn
+    /// </summary>
+    public void ResetUnits()
+    {
+        // browse all units
+        foreach(Unit w_unit in m_listOfUnits)
+        {
+            w_unit.ResetAvailability();
+        }
     }
     #endregion
 
@@ -97,83 +123,14 @@ public class Map : MonoBehaviour
     /// <returns>True if correctly init, false otherwise</returns>
     private bool InitialiseTiles()
     {
-        Vector3 w_min = new Vector3();
-        Vector3 w_max = new Vector3();
-        bool w_firstIter = true;
-        bool w_correctlyInitialized = true; // will be set to false when encoutering errors
-
         // get all tiles in the scene
         Tile[] w_tiles = FindObjectsOfType<Tile>();
 
-        // for each tiles on the map
-        foreach (Tile w_tile in w_tiles)
-        {
-             // store min an max value fore init
-            if (w_firstIter)
-            {
-                w_min = w_tile.transform.position;
-                w_max = w_min;
-                w_firstIter = false;
-            }
+        // compute caracteristics for map copsed of provided tiles
+        initGridCaracteristics(w_tiles);
 
-            // update min position value if found
-            if(w_tile.transform.position.x <= w_min.x && w_tile.transform.position.y <= w_min.y)
-            {
-                w_min = w_tile.transform.position;
-            }
-            // update max position value if found
-            else if(w_tile.transform.position.x >= w_max.x && w_tile.transform.position.y >= w_max.y)
-            {
-                w_max = w_tile.transform.position;
-            }
-        }
-
-        // computing map size
-        Vector3 w_size = w_max - w_min;
-        m_size.X = (int) (w_size.x + 1);
-        m_size.Y = (int) (w_size.y + 1);
-
-        // creating a map of tile with the good size
-        m_tileMap = new Tile[m_size.X, m_size.Y];
-
-        // store the transformation to apply from a X Y position to a X Y array index
-        m_positionToIndex = new PointF(w_min.x, w_min.y);
-
-        // Browse again each tile to place them in our 2D Map
-        Point w_index;
-        foreach (Tile w_tile in w_tiles)
-        {
-            // get index based on tile position
-            w_index = convertToGridPosition(w_tile.transform.position);
-            // check if index is free
-            if (m_tileMap[w_index.X, w_index.Y] != null)
-            {
-                print("ERROR : tile is full for position = " + w_index);
-                w_correctlyInitialized = false;
-            }
-            // add tile to index
-            else
-            {
-                m_tileMap[w_index.X, w_index.Y] = w_tile;
-                // store the position inside the tile
-                w_tile.setGridPosition(new Point(w_index.X, w_index.Y));
-            }
-        }
-
-        // check for each position if there is a tile
-        for(int ix = 0; ix < m_size.X; ix++)
-        {
-            for (int iy = 0; iy < m_size.Y; iy++)
-            {
-                if (m_tileMap[ix,iy] == null)
-                {
-                    print("ERROR : tile [" + ix + "," + iy + "] is NULL");
-                    w_correctlyInitialized = false;
-                }
-            }
-        }
-
-        return w_correctlyInitialized;
+        // fill the grid with each tiles based on previously computed caracteristics
+        return fillCaracterizedGrid(w_tiles);
     }
 
     /// <summary>
@@ -190,7 +147,7 @@ public class Map : MonoBehaviour
         foreach(Unit w_unit in w_units)
         {
             // adding unit to list
-            w_listOfUnit.Add(w_unit);
+            m_listOfUnits.Add(w_unit);
             // setting unit position on the grid
             w_unit.setGridPosition( convertToGridPosition(w_unit.transform.position) );
         }
@@ -264,7 +221,7 @@ public class Map : MonoBehaviour
     /// </summary>
     /// <param name="ai_basePosition">Position to start from</param>
     /// <param name="ai_range">Range of access</param>
-    /// <returns></returns>
+    /// <returns>List of eligible points</returns>
     List<Point> getPositionsWithin(Point ai_basePosition, int ai_range)
     {
         List<Point> w_result = new List<Point>();
@@ -283,6 +240,98 @@ public class Map : MonoBehaviour
         if (isInBounds(w_right)) { w_result.Add(w_right); }
 
         return w_result;
+    }
+
+    /// <summary>
+    /// Detects tiles characteristics such as :
+    ///  - Size
+    ///  - PositionToIndex transfoirmation
+    ///  - TileMap object
+    /// and store ioit in members
+    /// </summary>
+    void initGridCaracteristics(Tile[] ai_tiles)
+    {
+        // preconditions
+       if(ai_tiles.Length <= 0)
+        {
+            throw new Exception("No tiles provided for detectTilesCharecteristics");
+        }
+
+        //init min and max value
+        // safe as 0 exists here
+        Vector3 w_min = ai_tiles[0].transform.position;
+        Vector3 w_max = ai_tiles[0].transform.position;
+
+        // Get min and max tile :
+        foreach (Tile w_tile in ai_tiles)
+        {
+            // update min position value if found
+            if (w_tile.transform.position.x <= w_min.x && w_tile.transform.position.y <= w_min.y)
+            {
+                w_min = w_tile.transform.position;
+            }
+            // update max position value if found
+            else if (w_tile.transform.position.x >= w_max.x && w_tile.transform.position.y >= w_max.y)
+            {
+                w_max = w_tile.transform.position;
+            }
+        }
+
+        // computing map size
+        Vector3 w_size = w_max - w_min;
+        m_size.X = (int)(w_size.x + 1);
+        m_size.Y = (int)(w_size.y + 1);
+
+        // creating a map of tile with the good size
+        m_tileMap = new Tile[m_size.X, m_size.Y];
+
+        // store the transformation to apply from a X Y position to a X Y array index
+        m_positionToIndex = new PointF(w_min.x, w_min.y);
+    }
+
+    /// <summary>
+    /// Fills the grid of tiles with provided tiles based on their position
+    /// </summary>
+    /// <param name="ai_tiles">Tiles composing the map</param>
+    /// <returns>True if grid is correctly filled, false otherwise</returns>
+    bool fillCaracterizedGrid(Tile[] ai_tiles)
+    {
+        // Browse each tile to place them in our 2D Map
+        Point w_index;
+        foreach (Tile w_tile in ai_tiles)
+        {
+            // get index based on tile position
+            w_index = convertToGridPosition(w_tile.transform.position);
+            // check if index is free
+            if (m_tileMap[w_index.X, w_index.Y] != null)
+            {
+                print("ERROR : tile is full for position = " + w_index);
+                return false;
+            }
+            // add tile to index
+            else
+            {
+                m_tileMap[w_index.X, w_index.Y] = w_tile;
+                // store the position inside the tile
+                w_tile.setGridPosition(new Point(w_index.X, w_index.Y));
+            }
+        }
+
+        // check for each position if there is a tile
+        for (int ix = 0; ix < m_size.X; ix++)
+        {
+            for (int iy = 0; iy < m_size.Y; iy++)
+            {
+                if (m_tileMap[ix, iy] == null)
+                {
+                    print("ERROR : tile [" + ix + "," + iy + "] is NULL");
+                    return false;
+                }
+            }
+        }
+
+        // here no issues
+        return true;
     }
     #endregion
 }
