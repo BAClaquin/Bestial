@@ -46,33 +46,6 @@ public class Map : MonoBehaviour
     }
     #endregion
 
-
-    #region Public Functions
-    /// <summary>
-    /// Display all available tiles where unit can move
-    /// </summary>
-    /// <param name="ai_unit">Unit you want to move</param>
-    public void DisplayAvailableMoves(Unit ai_unit)
-    {
-        // the tile of the unit
-        List<Tile> w_unitTile = new List<Tile>();
-        w_unitTile.Add(m_tileMap[ai_unit.getGridPosition().X, ai_unit.getGridPosition().Y]);
-        // all accessible tiles
-        List<Tile> w_allTilesAccessible = new List<Tile>();
-        // compute and mark all accessible tiles for this unit
-        computeAccessibleTiles(ai_unit, ai_unit.Range, w_unitTile, w_allTilesAccessible);
-    }
-
-    #region Constructors
-    public Map()
-    {
-        m_tilesInitialized = false;
-        m_unitsInitialized = false;
-        m_listOfUnits = new List<Unit>();
-    }
-    #endregion
-
-
     #region Public Functions
     /// <summary>
     /// Display all available tiles where unit can move
