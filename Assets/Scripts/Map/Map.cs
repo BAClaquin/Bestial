@@ -60,7 +60,7 @@ public class Map : MonoBehaviour
         // all accessible tiles
         List<Tile> w_allTilesAccessible = new List<Tile>();
         // compute and mark all accessible tiles for this unit
-        computeAccessibleTiles(ai_unit, ai_unit.Range, w_unitTile, w_allTilesAccessible);
+        computeAccessibleTiles(ai_unit, ai_unit.MovementRange, w_unitTile, w_allTilesAccessible);
     }
 
     /// <summary>
@@ -140,15 +140,19 @@ public class Map : MonoBehaviour
                 // for each of these new neighbours
                 foreach (Point w_neighbourPoint in w_neighbours)
                 {
-                    // is the tile is accessible for the provided type of unit
-                    // and the tile has not already been marked as accessible
-                    if (m_tileMap[w_neighbourPoint.X, w_neighbourPoint.Y].isAccessibleForUnitType(ai_unit) &&
-                        !m_tileMap[w_neighbourPoint.X, w_neighbourPoint.Y].isTaggedAccessible())
+                    Tile w_currentTile = m_tileMap[w_neighbourPoint.X, w_neighbourPoint.Y];
+                    // if the tile has not already been tagged as accessible
+                    // checked in separate if to avoid multiple computations)
+                    if (! w_currentTile.isTaggedAccessible())
                     {
-                        // we have a new accessible tile to add
-                        w_newAccessibleTiles.Add(m_tileMap[w_neighbourPoint.X, w_neighbourPoint.Y]);
-                        // once added, set it as available which will mark it as available
-                        m_tileMap[w_neighbourPoint.X, w_neighbourPoint.Y].SetAsAccessible();
+                        // if the tile is accessible for the provided type of unit
+                        if (w_currentTile.isAccessibleForUnitType(ai_unit))
+                        {
+                            // we have a new accessible tile to add
+                            w_newAccessibleTiles.Add(w_currentTile);
+                            // once added, set it as available which will mark it as available
+                            w_currentTile.SetAsAccessible();
+                        }
                     }
                 }
             }

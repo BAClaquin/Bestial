@@ -95,13 +95,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70f5895605a2c74468482212a4f6e3f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Accessible_GroundUnit: 1
-  Accessible_WaterUnit: 0
-  Accessible_AirUnit: 1
-  Accessible_Vehicule: 1
+  AccessibleFieldOfOperation: 0000000002000000
+  AccessibleUnitType: 0000000001000000
   MovePossibleColor: {r: 0, g: 1, b: 0.07363963, a: 1}
-  AttackBonus: 0
-  DefenseBonus: 0
 --- !u!61 &6821395916331277358
 BoxCollider2D:
   m_ObjectHideFlags: 0

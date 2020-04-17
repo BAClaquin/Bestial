@@ -1,18 +1,28 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Drawing;
 using UnityEngine;
-using System.Drawing;
 
 /// <summary>
 /// Class managing and unit
 /// </summary>
 public class Unit : MonoBehaviour
 {
-    #region Public Members
+    #region Unity Public Members
+
+    [Header(UnityHeaders.Gameplay)]
+    /// <summary>
+    /// Field of operation of this unit
+    /// </summary>
+    public Field FieldOfOperation;
+    /// <summary>
+    /// Type of this unit
+    /// </summary>
+    public UnitType UnitType;
     /// <summary>
     /// Range (in tiles) of this unit
     /// </summary>
-    public int Range;
+    public int MovementRange;
+
+    [Header(UnityHeaders.Visuals)]
     /// <summary>
     /// Color of unit when selected
     /// </summary>
@@ -53,17 +63,47 @@ public class Unit : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        m_renders = GetComponentsInChildren<SpriteRenderer>();
-        
-        m_game = FindObjectOfType<Game>();
+        retreiveSceneComponents();
+        assertUserDefinedValues();
+    }
 
+    /// <summary>
+    /// Retreives components in the scene
+    /// </summary>
+    private void retreiveSceneComponents()
+    {
+        // all renders of the unit
+        m_renders = GetComponentsInChildren<SpriteRenderer>();
+        if(m_renders == null)
+        {
+            throw new System.NullReferenceException("m_renders is null");
+        }
+
+        // game object
+        m_game = FindObjectOfType<Game>();
+        if (m_game == null)
+        {
+            throw new System.NullReferenceException("m_game is null");
+        }
+    }
+
+    private void assertUserDefinedValues()
+    {
         // check for UnityConstruction values
         if (HighlightedColor == null)
         {
-            print("ERROR : No Highlighted provided for object Game");
-            throw new System.NullReferenceException("Highlighted is null");
+            throw new System.NullReferenceException("HighlightedColor is null");
+        }
+        if (DisabledColor == null)
+        {
+            throw new System.NullReferenceException("DisabledColor is null");
+        }
+        if(MovementRange < 0)
+        {
+            throw new System.ArgumentOutOfRangeException("MovementRange cannot be < 0");
         }
     }
+
 
     // Update is called once per frame
     void Update()
