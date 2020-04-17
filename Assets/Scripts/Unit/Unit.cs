@@ -31,7 +31,7 @@ public class Unit : MonoBehaviour
     /// <summary>
     /// Sprite render properties of this unit
     /// </summary>
-    private SpriteRenderer m_render;
+    private SpriteRenderer[] m_render;
     /// <summary>
     /// Manager of the current game played
     /// </summary>
@@ -53,7 +53,8 @@ public class Unit : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        m_render = GetComponent<SpriteRenderer>();
+        m_render = GetComponentsInChildren<SpriteRenderer>();
+        
         m_game = FindObjectOfType<Game>();
 
         // check for UnityConstruction values
@@ -67,7 +68,7 @@ public class Unit : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
 
@@ -78,7 +79,7 @@ public class Unit : MonoBehaviour
     private void OnMouseDown()
     {
         // no events for disbaled units
-        if(! m_disabled)
+        if (!m_disabled)
         {
             m_game.onSelectedUnit(this);
         }
@@ -90,7 +91,7 @@ public class Unit : MonoBehaviour
     /// </summary>
     public void Highlight()
     {
-        m_render.color = HighlightedColor;
+       ChangeSpritesColor(HighlightedColor);
     }
 
     /// <summary>
@@ -99,7 +100,7 @@ public class Unit : MonoBehaviour
     public void Disable()
     {
         m_disabled = true;
-        m_render.color = DisabledColor;
+        ChangeSpritesColor(DisabledColor);
     }
     #endregion
 
@@ -165,7 +166,7 @@ public class Unit : MonoBehaviour
     public void Unselect()
     {
         // if unit isnt disabled
-        if(!m_disabled)
+        if (!m_disabled)
         {
             // reset its visual effects
             ResetVisualEffects();
@@ -180,7 +181,15 @@ public class Unit : MonoBehaviour
     /// </summary>
     void ResetVisualEffects()
     {
-        m_render.color = UnityEngine.Color.white;
+        ChangeSpritesColor(UnityEngine.Color.white);
+    }
+
+    private void ChangeSpritesColor(UnityEngine.Color color)
+    {
+        foreach (SpriteRenderer sprite in m_render)
+        {
+            sprite.color = color;
+        }
     }
     #endregion
 }
