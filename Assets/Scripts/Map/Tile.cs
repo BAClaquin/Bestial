@@ -25,6 +25,44 @@ public class Tile : MonoBehaviour
     #endregion
 
     #region Private Memebrs
+    public UnityEngine.Color MovePossibleColor;
+    #endregion
+
+    /// <summary>
+    /// Sprite render properties of this tile
+    /// </summary>
+    private SpriteRenderer m_render;
+    /// <summary>
+    /// Position of the tile in the grid
+    /// </summary>
+    private Point m_gridPosition;
+    /// <summary>
+    /// Manager of the current game played
+    /// </summary>
+    private Game m_game;
+    #endregion
+
+    #region Game tags
+    /// <summary>
+    /// tagged as move possible during a game move
+    /// </summary>
+    private bool m_tagMovePossible = false;
+    #endregion
+
+    #region Public Functions
+    /// <summary>
+    ///  Sets the place of the tile in the grid position
+    /// </summary>
+    /// <param name="ai_position">Position to set tile to</param>
+    public void setGridPosition(Point ai_position) { m_gridPosition = ai_position;  }
+    /// <summary>
+    /// Get the position of this tile on the grid
+    /// </summary>
+    /// <returns>Point representing this position</returns>
+    public Point getGridPosition() { return m_gridPosition; }
+    #endregion
+
+    #region Private Memebrs
     /// <summary>
     /// Sprite render properties of this tile
     /// </summary>
