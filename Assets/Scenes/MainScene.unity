@@ -383,6 +383,7 @@ GameObject:
   - component: {fileID: 55393073}
   - component: {fileID: 55393072}
   - component: {fileID: 55393071}
+  - component: {fileID: 55393074}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -455,6 +456,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &55393074
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 55393070}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ade537fc62d5c974cb84efe75fbc9f08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &67895806 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6799478559495977229, guid: 639728846dbb9bb4e954a4ec41b3bc9a,
@@ -8960,6 +8973,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SniperWeaselContainer
+      objectReference: {fileID: 0}
+    - target: {fileID: 5616536792320207152, guid: 1cdf503f700ec31438dc9e89f1571b7b,
+        type: 3}
+      propertyPath: MoveSpeed
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1cdf503f700ec31438dc9e89f1571b7b, type: 3}

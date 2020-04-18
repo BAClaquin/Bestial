@@ -239,7 +239,7 @@ MonoBehaviour:
   FieldOfOperation: 0
   UnitType: 0
   MovementRange: 4
-  MoveSpeed: 4
+  MoveSpeed: 3
   HighlightedColor: {r: 0.97911936, g: 1, b: 0.3443396, a: 0.7294118}
   DisabledColor: {r: 0.5294118, g: 0.5294118, b: 0.5294118, a: 1}
 --- !u!212 &2085508483
