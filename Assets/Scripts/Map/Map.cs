@@ -145,7 +145,8 @@ public class Map : MonoBehaviour
                     if (! w_currentTile.isTaggedAccessible())
                     {
                         // if the tile is accessible for the provided type of unit
-                        if (w_currentTile.isAccessibleForUnitType(ai_unit))
+                        // and the tile if free
+                        if (w_currentTile.isAccessibleForUnitType(ai_unit) && isPositionFree(w_currentTile.getGridPosition()))
                         {
                             // we have a new accessible tile to add
                             w_newAccessibleTiles.Add(w_currentTile);
@@ -167,6 +168,25 @@ public class Map : MonoBehaviour
             }
         }
         // here nothing to do end of function
+    }
+
+    /// <summary>
+    /// Tells if a position is free of any unit
+    /// </summary>
+    /// <param name="ai_gridIndex">Grid index of the tile you wana check</param>
+    /// <returns>True if free, false otherwise</returns>
+    bool isPositionFree(Point ai_gridIndex)
+    {
+        foreach(Unit w_unit in m_listOfUnits)
+        {
+            // if an unit is found at this position : position is not free
+            if(w_unit.getGridPosition() == ai_gridIndex)
+            {
+                return false;
+            }
+        }
+        // here not unit found: position if free
+        return true;
     }
 
     /// <summary>

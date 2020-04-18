@@ -1,6 +1,5 @@
 ﻿using System.Drawing;
 using UnityEngine;
-using System.Drawing;
 using System;
 using System.Collections;
 
