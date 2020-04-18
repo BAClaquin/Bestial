@@ -9,35 +9,22 @@ using System.Drawing;
 public class Tile : MonoBehaviour
 {
 
-    #region Accessibility
+    #region Unity Public Members
+    [Header(UnityHeaders.Gameplay)]
     /// <summary>
-    /// is accessible by a ground unit
+    /// Field of action for which tile is accessible
     /// </summary>
-    public bool Accessible_GroundUnit;
-    // is accessible by a water unit
-    public bool Accessible_WaterUnit;
-    // is accessible by an Air unit
-    public bool Accessible_AirUnit;
-    // is accessible if unit is a vehicle
-    public bool Accessible_Vehicule;
-    #endregion
+    public List<Field> AccessibleFieldOfOperation;
+    /// <summary>
+    /// Unit types for which tiles is accessible
+    /// </summary>
+    public List<UnitType> AccessibleUnitType;
 
-    #region Visual
+    [Header(UnityHeaders.Visuals)]
     public UnityEngine.Color MovePossibleColor;
     #endregion
 
-    #region Bonus
-    /// <summary>
-    /// Attack bonus applied when unit is on this tile
-    /// </summary>
-    public int AttackBonus;
-    /// <summary>
-    /// Defense bonus applied when unit is on this tile
-    /// </summary>
-    public int DefenseBonus;
-    #endregion
-
-    #region Private Memebrs
+    #region Private Members
     /// <summary>
     /// Sprite render properties of this tile
     /// </summary>
@@ -50,13 +37,6 @@ public class Tile : MonoBehaviour
     /// Manager of the current game played
     /// </summary>
     private Game m_game;
-    #endregion
-
-    #region Game tags
-    /// <summary>
-    /// tagged as move possible during a game move
-    /// </summary>
-    private bool m_tagMovePossible = false;
     #endregion
 
     #region Public Functions
@@ -72,16 +52,54 @@ public class Tile : MonoBehaviour
     public Point getGridPosition() { return m_gridPosition; }
     #endregion
 
+    #region Game tags
+    /// <summary>
+    /// tagged as move possible during a game move
+    /// </summary>
+    private bool m_tagMovePossible = false;
+    #endregion
+
     // Start is called before the first frame update
     void Start()
     {
+        retreiveSceneComponents();
+        assertUserDefinedValues();
+    }
+
+    /// <summary>
+    /// Retreives components in the scene
+    /// </summary>
+    private void retreiveSceneComponents()
+    {
         m_render = GetComponent<SpriteRenderer>();
+        if (m_render == null)
+        {
+            throw new System.NullReferenceException("m_render is null");
+        }
+
+        // game object
         m_game = FindObjectOfType<Game>();
+        if (m_game == null)
+        {
+            throw new System.NullReferenceException("m_game is null");
+        }
+    }
+
+    private void assertUserDefinedValues()
+    {
         // check for UnityConstruction values
         if (MovePossibleColor == null)
         {
-            print("ERROR : No MovePossibleColor provided for object Game");
             throw new System.NullReferenceException("MovePossibleColor is null");
+        }
+        // check for UnityConstruction values
+        if (AccessibleUnitType == null)
+        {
+            throw new System.NullReferenceException("AccessibleUnitType is null");
+        }
+        if(AccessibleFieldOfOperation == null)
+        {
+            throw new System.NullReferenceException("AccessibleFieldOfAction is null");
         }
     }
 
@@ -117,8 +135,8 @@ public class Tile : MonoBehaviour
     /// <returns>True if unit has acces to this type of tile, false otherwise</returns>
     public bool isAccessibleForUnitType(Unit ai_unit)
     {
-        print("Temporaire, non terminé");
-        return true;
+        // must be accessible for unit type and unit field of operation
+        return AccessibleUnitType.Contains(ai_unit.UnitType) && AccessibleFieldOfOperation.Contains(ai_unit.FieldOfOperation);
     }
 
     /// <summary>

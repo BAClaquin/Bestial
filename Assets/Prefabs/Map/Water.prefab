@@ -95,13 +95,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70f5895605a2c74468482212a4f6e3f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Accessible_GroundUnit: 0
-  Accessible_WaterUnit: 1
-  Accessible_AirUnit: 1
-  Accessible_Vehicule: 1
+  AccessibleFieldOfOperation: 0100000002000000
+  AccessibleUnitType: 0000000001000000
   MovePossibleColor: {r: 0.056114297, g: 0.9150943, b: 0.8986094, a: 1}
-  AttackBonus: 0
-  DefenseBonus: 1
 --- !u!61 &-5840447986149203151
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -124,6 +120,10 @@ BoxCollider2D:
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 2.18, y: 2.19}
+  m_EdgeRadius: 0
   m_AutoTiling: 0
   serializedVersion: 2
   m_Size: {x: 2.18, y: 2.19}
