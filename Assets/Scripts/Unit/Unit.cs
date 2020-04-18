@@ -1,5 +1,8 @@
 ﻿using System.Drawing;
 using UnityEngine;
+using System.Drawing;
+using System;
+using System.Collections;
 
 /// <summary>
 /// Class managing and unit
@@ -23,6 +26,8 @@ public class Unit : MonoBehaviour
     public int MovementRange;
 
     [Header(UnityHeaders.Visuals)]
+    public float MoveSpeed = 0.1f;
+
     /// <summary>
     /// Color of unit when selected
     /// </summary>
@@ -54,6 +59,10 @@ public class Unit : MonoBehaviour
     /// When unit is disabled, no action is possible
     /// </summary>
     private bool m_disabled = false;
+
+
+    Animator m_anim;
+
     #endregion
 
     #region Game tags
@@ -89,6 +98,9 @@ public class Unit : MonoBehaviour
 
     private void assertUserDefinedValues()
     {
+        m_anim = GetComponentsInChildren<Animator>()[0];
+        m_anim.SetBool("isWalking",false);
+
         // check for UnityConstruction values
         if (HighlightedColor == null)
         {
@@ -108,7 +120,8 @@ public class Unit : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        //m_anim.SetBool("isWalking", isWalking);
+        //print(m_anim.GetBool("isWalking"))
     }
 
 
@@ -174,14 +187,11 @@ public class Unit : MonoBehaviour
         return m_gridPosition;
     }
 
-    public void moveTo(Point ai_newPosition)
-    {
-        // move
-        Vector3 w_move = new Vector3(ai_newPosition.X - m_gridPosition.X, ai_newPosition.Y - m_gridPosition.Y, 0);
+    public void moveTo(Point ai_newPosition) { 
 
         // deplacement
-        transform.Translate(w_move);
-
+        StartCoroutine(StartMovement(ai_newPosition));
+        
         // storring position in grid
         m_gridPosition = ai_newPosition;
 
@@ -190,6 +200,7 @@ public class Unit : MonoBehaviour
 
         ResetVisualEffects();
     }
+  
 
     /// <summary>
     /// Indicates if units has moved during this turn
@@ -226,10 +237,54 @@ public class Unit : MonoBehaviour
 
     private void ChangeSpritesColor(UnityEngine.Color color)
     {
-        foreach (SpriteRenderer sprite in m_renders)
+        Array.ForEach(m_renders, sprite => sprite.color = color);       
+    }
+
+    private IEnumerator StartMovement(Point ai_newPosition)
+    {
+        // start walking animation
+        m_anim.SetBool("isWalking", true);
+        
+        float w_targetPositionX = transform.position.x + (ai_newPosition.X - m_gridPosition.X);
+        float w_targetPositionY = transform.position.y + (ai_newPosition.Y - m_gridPosition.Y);
+        
+        // turn sprite in 
+        SetDirection(transform.position.x < w_targetPositionX);
+        
+        yield return MoveHorizontally(w_targetPositionX);
+        yield return MoveVertically(w_targetPositionY);
+        
+        // stop walkin annimation
+        m_anim.SetBool("isWalking", false);
+    }
+
+    private IEnumerator MoveHorizontally(float ai_targetPositionX)
+    {
+        while (!IsCloseEnoughToTargetPosition(transform.position.x, ai_targetPositionX))
         {
-            sprite.color = color;
+            transform.position = Vector3.MoveTowards(transform.position, new Vector3(ai_targetPositionX, transform.position.y, -1), MoveSpeed * Time.deltaTime);
+            yield return null;
         }
     }
+
+    private IEnumerator MoveVertically(float ai_targetPositionY)
+    {
+        while (!IsCloseEnoughToTargetPosition(transform.position.y, ai_targetPositionY))
+        {
+            transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, ai_targetPositionY, -1), MoveSpeed * Time.deltaTime);
+            yield return null;
+        }
+    }
+
+    private void SetDirection(bool ai_shouldTurnRight)
+    {
+        transform.eulerAngles = ai_shouldTurnRight ? new Vector3(0, 180, 0) : new Vector3(0, 0, 0);
+    }
+
+    private bool IsCloseEnoughToTargetPosition(float ai_position, float ai_targetPosition)
+    {
+        return Math.Abs(ai_position - ai_targetPosition) < 0.001f;
+    }
+
     #endregion
 }
