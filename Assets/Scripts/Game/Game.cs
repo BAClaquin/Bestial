@@ -1,6 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// Global Game Manager where you can manage Games
@@ -19,11 +19,17 @@ public class Game : MonoBehaviour
     /// Tracer module for this game
     /// </summary>
     public GameObject TracerModule;
+    public Text CurrentPlayerPlaceholder;
+    public Player[] Players;
+
     #endregion
 
     #region Private Memebrs
     Unit m_selectedUnit;
     #endregion
+
+    private int CurrentPlayerTurn = -1;
+    private bool GameIsOver = false;
 
     #region UI Functions
     void Start()
@@ -33,13 +39,17 @@ public class Game : MonoBehaviour
             print("ERROR : No trace module provided.");
             throw new System.NullReferenceException("TracerModule is null");
         }
+        
         // check for UnityConstruction values
         if (CurrentMap == null)
         {
             Tracer.Instance.Trace(TraceLevel.ERROR, "No map provided for object Game !");
             throw new System.NullReferenceException("CurrentMap is null");
         }
+
+        NextTurn();
         Tracer.Instance.Trace(TraceLevel.INFO, "Game started !");
+
     }
 
     // Update is called once per frame
@@ -55,8 +65,21 @@ public class Game : MonoBehaviour
     /// </summary>
     public void NextTurn()
     {
-        // reset all units (dumb implem for the momeent)
-        CurrentMap.ResetUnits();
+        if(GameIsOver)
+        {
+            throw new NotImplementedException("Game Over screen not implemented");
+        }else
+        {
+            SetNextPlayer();
+            CurrentMap.ResetUnits();
+        }
+    }
+
+    private void SetNextPlayer()
+    {
+        CurrentPlayerTurn = (CurrentPlayerTurn + 1) % Players.Length;
+        CurrentPlayerPlaceholder.text = Players[CurrentPlayerTurn].Name;
+        CurrentPlayerPlaceholder.color = Players[CurrentPlayerTurn].UnitColor;
     }
 
     /// <summary>
@@ -71,7 +94,7 @@ public class Game : MonoBehaviour
         // store selected unit
         m_selectedUnit = ai_unit;
         // if unit hasn't played
-        if(!m_selectedUnit.hasMoved())
+        if(!m_selectedUnit.hasMoved() && unitBelongToCurrentPlayer(m_selectedUnit))
         {
             ai_unit.Highlight();
             CurrentMap.DisplayAvailableMoves(m_selectedUnit);
@@ -87,7 +110,7 @@ public class Game : MonoBehaviour
         if(m_selectedUnit != null)
         {
             // DUMB IMPLEM
-            if (ai_tile.isTaggedAccessible() && !m_selectedUnit.hasMoved())
+            if (ai_tile.isTaggedAccessible() && !m_selectedUnit.hasMoved() && unitBelongToCurrentPlayer(m_selectedUnit))
             {
                 // move unit
                 m_selectedUnit.moveTo(ai_tile.getGridPosition());
@@ -98,6 +121,17 @@ public class Game : MonoBehaviour
             resetCurrentAction();
         }
     }
+
+    private bool unitBelongToCurrentPlayer(Unit m_selectedUnit)
+    {
+        return CurrentPlayer().HasUnit(m_selectedUnit);
+    }
+
+    private Player CurrentPlayer()
+    {
+        return Players[CurrentPlayerTurn];
+    }
+
     #endregion
 
     #region Private Functions
