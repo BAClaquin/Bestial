@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+
 /// <summary>
 /// Global Game Manager where you can manage Games
 /// </summary>
@@ -147,6 +148,7 @@ public class Game : MonoBehaviour
     {
         print("select ai_unit");
         resetCurrentAction();
+
         // if unit hasn't played
         if (!ai_unit.hasMoved() && unitBelongToCurrentPlayer(ai_unit))
         {
@@ -176,7 +178,7 @@ public class Game : MonoBehaviour
             print("unit slected");
             if (m_actionAfterMoveMode) // unit already selected + attackAfterMove + click on some tile => unit rests
             {
-                restUnit();
+                restUnit();               
             }
             else // unit selected + unit not moved + click on some tiles => unit moves
             {
@@ -199,8 +201,8 @@ public class Game : MonoBehaviour
     private IEnumerator moveUnit(Tile ai_tile)
     {
         CurrentMap.ResetAvailableMoves();
-        yield return m_selectedUnit.moveTo(ai_tile.getGridPosition());
-
+        //yield return m_selectedUnit.moveTo(ai_tile.getGridPosition());
+        yield return  m_selectedUnit.moveTo(CurrentMap.getComputedPathTo(ai_tile));
         // setup actions such as attacking or resting
         actionsAfterMove(ai_tile);
     }

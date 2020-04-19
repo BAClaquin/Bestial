@@ -5,7 +5,14 @@ using System.Drawing;
 using System;
 using System.Linq;
 
-public class Map : MonoBehaviour
+public interface IPathFindingMap
+{
+    bool IsPositionFree(Point ai_position);
+    Point getSize();
+    Tile[,] getGrid();
+}
+
+public class Map : MonoBehaviour, IPathFindingMap
 {
     #region Public Members
     /// <summary>
@@ -36,6 +43,10 @@ public class Map : MonoBehaviour
     /// Liste of units in the map
     /// </summary>
     List<Unit> m_listOfUnits;
+    /// <summary>
+    /// Path finder 
+    /// </summary>
+    private PathFinding m_pathFinder;
     #endregion
 
     #region Constructors
@@ -55,13 +66,21 @@ public class Map : MonoBehaviour
     public void DisplayAvailableMoves(Unit ai_unit)
     {
         // the tile of the unit
-        List<Tile> w_unitTile = new List<Tile>(); // TODO : ask why we need a list here ??
-        w_unitTile.Add(m_tileMap[ai_unit.getGridPosition().X, ai_unit.getGridPosition().Y]); 
+
+        /*List<Tile> w_unitTile = new List<Tile>();
+        w_unitTile.Add(m_tileMap[ai_unit.getGridPosition().X, ai_unit.getGridPosition().Y]);
 
         // all accessible tiles
         List<Tile> w_allTilesAccessible = new List<Tile>();
         // compute and mark all accessible tiles for this unit
-        computeAccessibleTiles(ai_unit, ai_unit.MovementRange, w_unitTile, w_allTilesAccessible);
+        computeAccessibleTiles(ai_unit, ai_unit.MovementRange, w_unitTile, w_allTilesAccessible);*/
+
+        List<PathFindingTile> w_accessibleTiles = m_pathFinder.computeAllAccessibleShortestPaths(ai_unit);
+        // show each accessible tiles
+        foreach(PathFindingTile w_pfTile in w_accessibleTiles)
+        {
+            w_pfTile.Tile.SetAsAccessible();
+        }
     }
 
     public void removeUnit(Unit unit)
@@ -116,6 +135,49 @@ public class Map : MonoBehaviour
             w_unit.ResetAvailability();
         }
     }
+
+
+    /// <summary>
+    /// Tells if a position is free of any unit
+    /// </summary>
+    /// <param name="ai_gridIndex">Grid index of the tile you wana check</param>
+    /// <returns>True if free, false otherwise</returns>
+    public bool IsPositionFree(Point ai_gridIndex)
+    {
+        foreach (Unit w_unit in m_listOfUnits)
+        {
+            // if an unit is found at this position : position is not free
+            if (w_unit.getGridPosition() == ai_gridIndex)
+            {
+                return false;
+            }
+        }
+        // here not unit found: position if free
+        return true;
+    }
+
+    public List<Tile> getComputedPathTo(Tile ai_tile)
+    {
+        return m_pathFinder.getComputedPathTo(ai_tile);
+    }
+
+    /// <summary>
+    /// Provides the size of the map
+    /// </summary>
+    /// <returns>Size of the map</returns>
+    public Point getSize()
+    {
+        return m_size;
+    }
+
+    /// <summary>
+    /// Provides the grid map
+    /// </summary>
+    /// <returns>grid map</returns>
+    public Tile[,] getGrid()
+    {
+        return m_tileMap;
+    }
     #endregion
 
     #region UI Functions
@@ -138,6 +200,8 @@ public class Map : MonoBehaviour
         }
         // initialise units based on what's present on the scene
         m_unitsInitialized = InitialiseUnits();
+        // init path finding
+        m_pathFinder = new PathFinding(this);
     }
 
     // Update is called once per frame
@@ -178,7 +242,7 @@ public class Map : MonoBehaviour
                     {
                         // if the tile is accessible for the provided type of unit
                         // and the tile if free
-                        if (w_currentTile.isAccessibleForUnitType(ai_unit) && isPositionFree(w_currentTile.getGridPosition()))
+                        if (w_currentTile.isAccessibleForUnitType(ai_unit) && IsPositionFree(w_currentTile.getGridPosition()))
                         {
                             // we have a new accessible tile to add
                             w_newAccessibleTiles.Add(w_currentTile);
@@ -200,25 +264,6 @@ public class Map : MonoBehaviour
             }
         }
         // here nothing to do end of function
-    }
-
-    /// <summary>
-    /// Tells if a position is free of any unit
-    /// </summary>
-    /// <param name="ai_gridIndex">Grid index of the tile you wana check</param>
-    /// <returns>True if free, false otherwise</returns>
-    bool isPositionFree(Point ai_gridIndex)
-    {
-        foreach(Unit w_unit in m_listOfUnits)
-        {
-            // if an unit is found at this position : position is not free
-            if(w_unit.getGridPosition() == ai_gridIndex)
-            {
-                return false;
-            }
-        }
-        // here not unit found: position if free
-        return true;
     }
 
     /// <summary>

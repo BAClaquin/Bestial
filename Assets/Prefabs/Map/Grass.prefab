@@ -97,6 +97,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AccessibleFieldOfOperation: 0000000002000000
   AccessibleUnitType: 0000000001000000
+  MovingCost: 2
   MovePossibleColor: {r: 0, g: 1, b: 0.07363963, a: 1}
   AttackPossibleColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!61 &6821395916331277358

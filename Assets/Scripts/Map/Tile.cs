@@ -19,6 +19,10 @@ public class Tile : MonoBehaviour
     /// Unit types for which tiles is accessible
     /// </summary>
     public List<UnitType> AccessibleUnitType;
+    /// <summary>
+    /// Cost to move into this tile
+    /// </summary>
+    public int MovingCost;
 
     [Header(UnityHeaders.Visuals)]
     public UnityEngine.Color MovePossibleColor;

@@ -2,6 +2,7 @@
 using UnityEngine;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 /// <summary>
 /// Class managing and unit
@@ -135,7 +136,7 @@ public class Unit : MonoBehaviour
 
         // filter all the renderers that must change with the players' color
         m_coloredOutfitRenderers = Array.FindAll(w_allChildrenSpriteRenderers, Sprite => Sprite.name == m_coloredOutfitGameObjectTag);
-        if (m_renderers == null)
+        if (m_coloredOutfitRenderers == null)
         {
             throw new System.NullReferenceException("m_coloredOutfitRenderers is null");
         }
@@ -248,7 +249,21 @@ public class Unit : MonoBehaviour
         // storing position in grid
         m_gridPosition = ai_newPosition;    
     }
-  
+
+    public IEnumerator moveTo(List<Tile> ai_path)
+    {
+        foreach(Tile w_tile in ai_path)
+        {
+            Tracer.Instance.Trace(TraceLevel.DEBUG, "GOTO -> " + w_tile.getGridPosition());
+            // deplacement
+            yield return StartMovement(w_tile.getGridPosition());
+            // storring position in grid
+            m_gridPosition = w_tile.getGridPosition();
+        }
+        // unit has conumes its move
+        m_hasMoved = true;
+    }
+
 
     /// <summary>
     /// Indicates if units has moved during this turn
