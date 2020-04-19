@@ -93,7 +93,7 @@ public class Map : MonoBehaviour
         // check for UnityConstruction values
         if (TileSize <= 0)
         {
-            print("ERROR : TileSize <= 0");
+            Tracer.Instance.Trace(TraceLevel.ERROR, "Tile size is " + TileSize + " <= 0");
             throw new System.ArgumentOutOfRangeException("TileSize <= 0");
         }
 
@@ -101,7 +101,7 @@ public class Map : MonoBehaviour
         m_tilesInitialized = InitialiseTiles();
         if(!m_tilesInitialized)
         {
-            print("ERROR : tiles not correctly initialized : won't go further.");
+            Tracer.Instance.Trace(TraceLevel.ERROR, "Tiles not correctly initialized: won't go further.");
             return;
         }
         // initialise units based on what's present on the scene
@@ -377,7 +377,7 @@ public class Map : MonoBehaviour
             // check if index is free
             if (m_tileMap[w_index.X, w_index.Y] != null)
             {
-                print("ERROR : tile is full for position = " + w_index);
+                Tracer.Instance.Trace(TraceLevel.ERROR, "Tile is full for position = " + w_index);
                 return false;
             }
             // add tile to index
@@ -396,7 +396,7 @@ public class Map : MonoBehaviour
             {
                 if (m_tileMap[ix, iy] == null)
                 {
-                    print("ERROR : tile [" + ix + "," + iy + "] is NULL");
+                    Tracer.Instance.Trace(TraceLevel.ERROR, "Tile[" + ix + ", " + iy + "] is NULL");
                     return false;
                 }
             }

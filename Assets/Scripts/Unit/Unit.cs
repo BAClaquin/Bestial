@@ -116,13 +116,17 @@ public class Unit : MonoBehaviour
         {
             throw new System.NullReferenceException("m_game is null");
         }
+
+        m_anim = GetComponentsInChildren<Animator>()[0];
+        if (m_anim == null)
+        {
+            throw new System.NullReferenceException("m_anim is null");
+        }
+        m_anim.SetBool("isWalking", false);
     }
 
     private void assertUserDefinedValues()
     {
-        m_anim = GetComponentsInChildren<Animator>()[0];
-        m_anim.SetBool("isWalking",false);
-
         // check for UnityConstruction values
         if (HighlightedColor == null)
         {
@@ -266,7 +270,7 @@ public class Unit : MonoBehaviour
     private IEnumerator StartMovement(Point ai_newPosition)
     {
         // start walking animation
-        m_anim.SetBool("isWalking", true);
+        m_anim.SetBool(UnityAnimationTags.IsWalking, true);
         
         float w_targetPositionX = transform.position.x + (ai_newPosition.X - m_gridPosition.X);
         float w_targetPositionY = transform.position.y + (ai_newPosition.Y - m_gridPosition.Y);
@@ -278,7 +282,7 @@ public class Unit : MonoBehaviour
         yield return MoveVertically(w_targetPositionY);
         
         // stop walkin annimation
-        m_anim.SetBool("isWalking", false);
+        m_anim.SetBool(UnityAnimationTags.IsWalking, false);
         ChangeSpritesColor(DisabledColor);
     }
 

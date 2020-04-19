@@ -59,6 +59,8 @@ public class Tile : MonoBehaviour
     private bool m_tagMovePossible = false;
     #endregion
 
+    #region Construction and Unity Functions
+
     // Start is called before the first frame update
     void Start()
     {
@@ -103,11 +105,13 @@ public class Tile : MonoBehaviour
         }
     }
 
+
     // Update is called once per frame
     void Update()
     {
         
     }
+    #endregion
 
     #region UI Functions
     /// <summary>
