@@ -15,10 +15,15 @@ public class Unit : MonoBehaviour
     /// Field of operation of this unit
     /// </summary>
     public Field FieldOfOperation;
+
+
     /// <summary>
     /// Type of this unit
     /// </summary>
     public UnitType UnitType;
+
+
+
     /// <summary>
     /// Range (in tiles) of this unit
     /// </summary>
@@ -37,9 +42,10 @@ public class Unit : MonoBehaviour
     public UnityEngine.Color DisabledColor;
 
     /// <summary>
-    /// Color of unit when disabled
+    /// Player of the unit
     /// </summary>
-    public UnityEngine.Color PlayerColor;
+    private UnityEngine.Color PlayerColor;
+
     #endregion
 
     #region Private Members
@@ -86,7 +92,25 @@ public class Unit : MonoBehaviour
     {
         retreiveSceneComponents();
         assertUserDefinedValues();
-        setColorOutfit();
+        if (PlayerColor != null)
+        {
+            ApplyPlayerColor(PlayerColor);
+        }
+        else
+        {
+            Tracer.Instance.Trace(TraceLevel.WARNING, "Player Null" );
+        }
+        
+    }
+
+    void Update()
+    {
+
+    }
+
+    public void SetPlayerColor(UnityEngine.Color ai_playerColor)
+    {
+        PlayerColor = ai_playerColor;     
     }
 
     /// <summary>
@@ -136,10 +160,6 @@ public class Unit : MonoBehaviour
         {
             throw new System.NullReferenceException("DisabledColor is null");
         }
-        if (PlayerColor == null)
-        {
-            throw new System.NullReferenceException("PlayerColor is null");
-        }
         if (MovementRange < 0)
         {
             throw new System.ArgumentOutOfRangeException("MovementRange cannot be < 0");
@@ -167,6 +187,8 @@ public class Unit : MonoBehaviour
     {
        ChangeSpritesColor(HighlightedColor);
     }
+
+
 
     /// <summary>
     /// Disable the unit
@@ -261,12 +283,6 @@ public class Unit : MonoBehaviour
         Array.ForEach(m_renderers, sprite => sprite.color = ai_color);       
     }
 
-    private void setColorOutfit()
-    {
-        SpriteRenderer[] playerColoredSpriteRenderer  = Array.FindAll(GetComponentsInChildren<SpriteRenderer>(), Sprite => Sprite.name == "playerColoredOutfit");
-        Array.ForEach(playerColoredSpriteRenderer, sprite => sprite.color = PlayerColor);
-    }
-
     private IEnumerator StartMovement(Point ai_newPosition)
     {
         // start walking animation
@@ -314,5 +330,9 @@ public class Unit : MonoBehaviour
         return Math.Abs(ai_position - ai_targetPosition) < 0.001f;
     }
 
+    private void ApplyPlayerColor(UnityEngine.Color unitColors)
+    {
+        Array.ForEach(m_coloredOutfitRenderers, sprite => sprite.color = unitColors);
+    }
     #endregion
 }

@@ -304,9 +304,8 @@ MonoBehaviour:
   UnitType: 0
   MovementRange: 3
   MoveSpeed: 4
-  HighlightedColor: {r: 0.9591497, g: 1, b: 0.2216981, a: 1}
+  HighlightedColor: {r: 1, g: 1, b: 1, a: 1}
   DisabledColor: {r: 0.5283019, g: 0.5283019, b: 0.5283019, a: 1}
-  PlayerColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!1001 &5695524840379730472
 PrefabInstance:
   m_ObjectHideFlags: 0
