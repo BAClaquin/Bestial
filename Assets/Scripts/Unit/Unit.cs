@@ -35,6 +35,11 @@ public class Unit : MonoBehaviour
     /// Color of unit when disabled
     /// </summary>
     public UnityEngine.Color DisabledColor;
+
+    /// <summary>
+    /// Color of unit when disabled
+    /// </summary>
+    public UnityEngine.Color PlayerColor;
     #endregion
 
     #region Private Members
@@ -42,10 +47,17 @@ public class Unit : MonoBehaviour
     /// Position of an unit ona 2D grid
     /// </summary>
     private Point m_gridPosition;
+    
     /// <summary>
-    /// Sprite render properties of this unit
+    /// Sprite renderers of this unit
     /// </summary>
-    private SpriteRenderer[] m_renders;
+    private SpriteRenderer[] m_renderers;
+
+    /// <summary>
+    /// Sprite renderers of this unit which display the player's color
+    /// </summary>
+    private SpriteRenderer[] m_coloredOutfitRenderers;
+
     /// <summary>
     /// Manager of the current game played
     /// </summary>
@@ -60,7 +72,8 @@ public class Unit : MonoBehaviour
     private bool m_disabled = false;
 
 
-    Animator m_anim;
+    private Animator m_anim;
+    private string m_coloredOutfitGameObjectTag = "playerColoredOutfit";
 
     #endregion
 
@@ -73,6 +86,7 @@ public class Unit : MonoBehaviour
     {
         retreiveSceneComponents();
         assertUserDefinedValues();
+        setColorOutfit();
     }
 
     /// <summary>
@@ -80,11 +94,20 @@ public class Unit : MonoBehaviour
     /// </summary>
     private void retreiveSceneComponents()
     {
-        // all renders of the unit
-        m_renders = GetComponentsInChildren<SpriteRenderer>();
-        if(m_renders == null)
+        SpriteRenderer[] w_allChildrenSpriteRenderers = GetComponentsInChildren<SpriteRenderer>();
+
+        // filter all the renderers that must not change with the players' color
+        m_renderers = Array.FindAll(w_allChildrenSpriteRenderers, Sprite => Sprite.name != m_coloredOutfitGameObjectTag);       
+        if (m_renderers == null)
         {
-            throw new System.NullReferenceException("m_renders is null");
+            throw new System.NullReferenceException("m_renderers is null");
+        }
+
+        // filter all the renderers that must change with the players' color
+        m_coloredOutfitRenderers = Array.FindAll(w_allChildrenSpriteRenderers, Sprite => Sprite.name == m_coloredOutfitGameObjectTag);
+        if (m_renderers == null)
+        {
+            throw new System.NullReferenceException("m_coloredOutfitRenderers is null");
         }
 
         // game object
@@ -109,7 +132,11 @@ public class Unit : MonoBehaviour
         {
             throw new System.NullReferenceException("DisabledColor is null");
         }
-        if(MovementRange < 0)
+        if (PlayerColor == null)
+        {
+            throw new System.NullReferenceException("PlayerColor is null");
+        }
+        if (MovementRange < 0)
         {
             throw new System.ArgumentOutOfRangeException("MovementRange cannot be < 0");
         }
@@ -234,9 +261,15 @@ public class Unit : MonoBehaviour
         ChangeSpritesColor(UnityEngine.Color.white);
     }
 
-    private void ChangeSpritesColor(UnityEngine.Color color)
+    private void ChangeSpritesColor(UnityEngine.Color ai_color)
     {
-        Array.ForEach(m_renders, sprite => sprite.color = color);       
+        Array.ForEach(m_renderers, sprite => sprite.color = ai_color);       
+    }
+
+    private void setColorOutfit()
+    {
+        SpriteRenderer[] playerColoredSpriteRenderer  = Array.FindAll(GetComponentsInChildren<SpriteRenderer>(), Sprite => Sprite.name == "playerColoredOutfit");
+        Array.ForEach(playerColoredSpriteRenderer, sprite => sprite.color = PlayerColor);
     }
 
     private IEnumerator StartMovement(Point ai_newPosition)
