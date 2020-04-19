@@ -7,11 +7,18 @@ using UnityEngine;
 /// </summary>
 public class Game : MonoBehaviour
 {
-    #region Public Members
+    #region Public Unity Members
+    [Header(UnityHeaders.Gameplay)]
     /// <summary>
     /// Current Map Played
     /// </summary>
     public Map CurrentMap;
+
+    [Header(UnityHeaders.Developp)]
+    /// <summary>
+    /// Tracer module for this game
+    /// </summary>
+    public GameObject TracerModule;
     #endregion
 
     #region Private Memebrs
@@ -21,12 +28,18 @@ public class Game : MonoBehaviour
     #region UI Functions
     void Start()
     {
+        if (TracerModule == null)
+        {
+            print("ERROR : No trace module provided.");
+            throw new System.NullReferenceException("TracerModule is null");
+        }
         // check for UnityConstruction values
         if (CurrentMap == null)
-         {
-             print("ERROR : No map provided for object Game");
-             throw new System.NullReferenceException("CurrentMap is null");
-         }
+        {
+            Tracer.Instance.Trace(TraceLevel.ERROR, "No map provided for object Game !");
+            throw new System.NullReferenceException("CurrentMap is null");
+        }
+        Tracer.Instance.Trace(TraceLevel.INFO, "Game started !");
     }
 
     // Update is called once per frame
