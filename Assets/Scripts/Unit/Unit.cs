@@ -142,15 +142,6 @@ public class Unit : MonoBehaviour
         }
     }
 
-
-    // Update is called once per frame
-    void Update()
-    {
-        //m_anim.SetBool("isWalking", isWalking);
-        //print(m_anim.GetBool("isWalking"))
-    }
-
-
     #region User Interaction Functions
     /// <summary>
     /// Occurs when user click on this unit
@@ -179,7 +170,7 @@ public class Unit : MonoBehaviour
     public void Disable()
     {
         m_disabled = true;
-        ChangeSpritesColor(DisabledColor);
+
     }
     #endregion
 
@@ -223,8 +214,8 @@ public class Unit : MonoBehaviour
 
         // unit has conumes its move
         m_hasMoved = true;
-
-        ResetVisualEffects();
+        
+        //ResetVisualEffects();
     }
   
 
@@ -288,6 +279,7 @@ public class Unit : MonoBehaviour
         
         // stop walkin annimation
         m_anim.SetBool("isWalking", false);
+        ChangeSpritesColor(DisabledColor);
     }
 
     private IEnumerator MoveHorizontally(float ai_targetPositionX)
