@@ -65,7 +65,8 @@ public class Game : MonoBehaviour
     /// </summary>
     public void NextTurn()
     {
-        if(GameIsOver)
+        resetCurrentAction();
+        if (GameIsOver)
         {
             throw new NotImplementedException("Game Over screen not implemented");
         }else
