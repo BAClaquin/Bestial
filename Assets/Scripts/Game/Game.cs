@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+
 
 /// <summary>
 /// Global Game Manager where you can manage Games
@@ -26,6 +29,8 @@ public class Game : MonoBehaviour
 
     #region Private Memebrs
     Unit m_selectedUnit;
+    bool m_actionAfterMoveMode = false;
+    List<Unit> m_targetableUnits;
     #endregion
 
     private int CurrentPlayerTurn = -1;
@@ -39,7 +44,7 @@ public class Game : MonoBehaviour
             print("ERROR : No trace module provided.");
             throw new System.NullReferenceException("TracerModule is null");
         }
-        
+
         // check for UnityConstruction values
         if (CurrentMap == null)
         {
@@ -65,11 +70,13 @@ public class Game : MonoBehaviour
     /// </summary>
     public void NextTurn()
     {
-        if(GameIsOver)
+        if (GameIsOver)
         {
             throw new NotImplementedException("Game Over screen not implemented");
-        }else
+        }
+        else
         {
+            resetCurrentAction();
             SetNextPlayer();
             CurrentMap.ResetUnits();
         }
@@ -88,17 +95,76 @@ public class Game : MonoBehaviour
     /// <param name="ai_unit"></param>
     public void onSelectedUnit(Unit ai_unit)
     {
-        // reset current action if selecting another unit
+
+        //bool doubleClick = m_selectedUnit != null && m_selectedUnit == ai_unit && unitBelongToCurrentPlayer(ai_unit);
+        //bool clickOnTargetableUnit = m_selectedUnit != null  && m_targetableUnits.Contains(ai_unit);
+
+        if (m_selectedUnit != null && m_targetableUnits != null && m_targetableUnits.Contains(ai_unit) && !unitBelongToCurrentPlayer(ai_unit))
+        {
+            attackEnnemi(ai_unit);
+        }
+        else if (m_selectedUnit != null)
+        {
+            if (m_actionAfterMoveMode)
+            {
+                restUnit();
+                selectUnit(ai_unit);
+            }
+            else
+            {
+                if (m_selectedUnit == ai_unit)
+                {
+                    restUnit();
+                }
+                else
+                {
+                    selectUnit(ai_unit);
+                }
+            }
+        }
+        else
+        {
+            selectUnit(ai_unit);
+        }
+
+
+
+        /*
+        if (doubleClick) // clicked twice on the same unit (and unit belongs to current player) => restUnit
+        {
+            restUnit();
+        }
+        else if (clickOnTargetableUnit) 
+        {
+            attackEnnemi(ai_unit);
+        }
+        else // select ai_unit
+        {
+            selectUnit(ai_unit);
+        }*/
+    }
+
+    private void selectUnit(Unit ai_unit)
+    {
+        print("select ai_unit");
         resetCurrentAction();
 
-        // store selected unit
-        m_selectedUnit = ai_unit;
         // if unit hasn't played
-        if(!m_selectedUnit.hasMoved() && unitBelongToCurrentPlayer(m_selectedUnit))
+        if (!ai_unit.hasMoved() && unitBelongToCurrentPlayer(ai_unit))
         {
+            m_selectedUnit = ai_unit;
             ai_unit.Highlight();
-            CurrentMap.DisplayAvailableMoves(m_selectedUnit);
+            CurrentMap.DisplayAvailableMoves(ai_unit);
+            m_targetableUnits = CurrentMap.DisplayAvailableTargets(CurrentPlayer(), ai_unit);
         }
+    }
+
+    private void attackEnnemi(Unit ai_unit)
+    {
+        CurrentMap.removeUnit(ai_unit);
+        ai_unit.Kill(); // kill targeted unit
+        m_selectedUnit.Disable();
+        resetCurrentAction();
     }
 
     /// <summary>
@@ -107,17 +173,51 @@ public class Game : MonoBehaviour
     /// <param name="ai_tile"></param>
     public void onSelectedTile(Tile ai_tile)
     {
-        if(m_selectedUnit != null)
+        if (m_selectedUnit != null)
         {
-            // DUMB IMPLEM
-            if (ai_tile.isTaggedAccessible() && !m_selectedUnit.hasMoved() && unitBelongToCurrentPlayer(m_selectedUnit))
+            print("unit slected");
+            if (m_actionAfterMoveMode) // unit already selected + attackAfterMove + click on some tile => unit rests
             {
-                // move unit
-                m_selectedUnit.moveTo(ai_tile.getGridPosition());
-                // disable next moves
-                m_selectedUnit.Disable();
+                restUnit();               
             }
-            // reset actions
+            else // unit selected + unit not moved + click on some tiles => unit moves
+            {
+                bool unitCanMoveToTile = ai_tile.isTaggedAccessible() && !m_selectedUnit.hasMoved() && unitBelongToCurrentPlayer(m_selectedUnit);
+                if (unitCanMoveToTile)
+                {
+                    StartCoroutine(moveUnit(ai_tile));
+                }
+            }
+        }
+    }
+
+    private void restUnit()
+    {
+        m_actionAfterMoveMode = false;
+        m_selectedUnit.Disable();
+        resetCurrentAction();
+    }
+
+    private IEnumerator moveUnit(Tile ai_tile)
+    {
+        CurrentMap.ResetAvailableMoves();
+        //yield return m_selectedUnit.moveTo(ai_tile.getGridPosition());
+        yield return  m_selectedUnit.moveTo(CurrentMap.getComputedPathTo(ai_tile));
+        // setup actions such as attacking or resting
+        actionsAfterMove(ai_tile);
+    }
+
+    private void actionsAfterMove(Tile ai_tile)
+    {
+        m_targetableUnits = CurrentMap.DisplayAvailableTargets(CurrentPlayer(), m_selectedUnit);
+        bool w_thereAreTargetableEnnemyUnits = m_targetableUnits.Count != 0;
+        if (w_thereAreTargetableEnnemyUnits) // if unit can attack, user must chose betweek attack or rest
+        {
+            m_actionAfterMoveMode = true;
+        }
+        else // otherwise the unit rests
+        {
+            m_selectedUnit.Disable();
             resetCurrentAction();
         }
     }
@@ -140,7 +240,8 @@ public class Game : MonoBehaviour
     /// </summary>
     void resetCurrentAction()
     {
-        if(m_selectedUnit != null)
+        m_actionAfterMoveMode = false;
+        if (m_selectedUnit != null)
         {
             // reset availability of an nit
             m_selectedUnit.Unselect();

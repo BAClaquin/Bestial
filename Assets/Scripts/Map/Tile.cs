@@ -19,9 +19,16 @@ public class Tile : MonoBehaviour
     /// Unit types for which tiles is accessible
     /// </summary>
     public List<UnitType> AccessibleUnitType;
+    /// <summary>
+    /// Cost to move into this tile
+    /// </summary>
+    public int MovingCost;
 
     [Header(UnityHeaders.Visuals)]
     public UnityEngine.Color MovePossibleColor;
+
+    [Header(UnityHeaders.Visuals)]
+    public UnityEngine.Color AttackPossibleColor;
     #endregion
 
     #region Private Members
@@ -57,6 +64,7 @@ public class Tile : MonoBehaviour
     /// tagged as move possible during a game move
     /// </summary>
     private bool m_tagMovePossible = false;
+
     #endregion
 
     #region Construction and Unity Functions
@@ -129,6 +137,14 @@ public class Tile : MonoBehaviour
     {
         m_tagMovePossible = true;
         m_render.color = MovePossibleColor;
+    }
+
+    /// <summary>
+    /// Sets the tile as attackable
+    /// </summary>
+    public void SetAsAttackable()
+    {
+        m_render.color = AttackPossibleColor;
     }
 
     /// <summary>

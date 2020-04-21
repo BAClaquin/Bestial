@@ -2,11 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+// DRAFT EN COURS
+/*
 public enum GameState
 {
-    WAIT_ACTION,
-    WAIT_MOVE,
-    WAIT_ATTACK_CHOICE
+    WAIT_GAME_ACTION,
+    WAIT_UNIT_ACTION,
+    UNIT_MOVED,
+    UNIT_ATTACKED,
+    NEXT_TURN
 }
 
 public interface GameActions
@@ -18,7 +23,7 @@ public interface GameActions
 
 public interface GameEvent
 {
-    void selectUnit();
+    void selectUnit(Unit ai_unit);
     void selectTile(Tile ai_tile);
 }
 
@@ -29,6 +34,7 @@ public class GameStateChart : GameEvent
 {
     #region Private Members
     GameState m_current_state;
+    Unit m_selectedUnit;
     #endregion
 
     #region Constructors
@@ -37,14 +43,14 @@ public class GameStateChart : GameEvent
     /// </summary>
     public GameStateChart()
     {
-        m_current_state = GameState.WAIT_ACTION;
+        m_current_state = GameState.WAIT_GAME_ACTION;
     }
     #endregion
 
     #region Game Events
-    void GameEvent.selectTile(Tile ai_tile)
+    void selectTile(Tile ai_tile)
     {
-        if(m_current_state == GameState.WAIT_MOVE)
+        if(m_current_state == GameState.WAIT_UNIT_ACTION)
         {
 
         }
@@ -54,11 +60,74 @@ public class GameStateChart : GameEvent
         }
     }
 
-    void GameEvent.selectUnit()
+    void selectUnit(Unit ai_unit)
+    {
+        // Waiting any game action
+        if (m_current_state == GameState.WAIT_GAME_ACTION)
+        {
+            DisplayPossibleUnitActions(ai_unit);
+            goToState(GameState.WAIT_UNIT_ACTION);
+        }
+        else if(m_current_state == GameState.WAIT_UNIT_ACTION)
+        {
+            if(m_selectedUnit != ai_unit) // and unit is in same team @TODO
+            {
+                goToState(GameState.WAIT_GAME_ACTION);
+                selectUnit(ai_unit);
+            }
+        }
+    }
+    #endregion
+
+    #region GameActions
+    /// <summary>
+    /// Displays all possible actions for this unit
+    /// </summary>
+    private void DisplayPossibleUnitActions(Unit ai_unit)
+    {
+        DisplayPossibleMoves(ai_unit);
+        //DisplayPossibleAttacks(ai_unit);
+    }
+
+    private void DisplayPossibleMoves(Unit ai_unit)
+    {
+
+    }
+
+    private void DisplayPossibleAttacks(Unit ai_unit)
     {
         throw new System.NotImplementedException();
     }
     #endregion
 
+    #region StateChartFunctions
+    void goToState(GameState ai_state)
+    {
+        bool w_requestAccepted = true;
+        Tracer.Instance.Trace(TraceLevel.INFO, "Requested transition from " + m_current_state.ToString() + " to " + ai_state.ToString());
 
+        if (m_current_state == GameState.WAIT_UNIT_ACTION && ai_state == GameState.WAIT_GAME_ACTION)
+        {
+            transit_from_WaitUnitAction_to_waitGameAction();
+        }
+        else
+        {
+            w_requestAccepted = false;
+            Tracer.Instance.Trace(TraceLevel.INFO, "Requested transition from " + m_current_state.ToString() + " to " + ai_state.ToString());
+        }
+        if(w_requestAccepted)
+        {
+            m_current_state = ai_state;
+        }
+        Tracer.Instance.Trace(TraceLevel.INFO, "Game state is " + m_current_state.ToString());
+    }
+
+
+    // TRANSITIONS
+    public void transit_from_WaitUnitAction_to_waitGameAction()
+    {
+        // reset unit posible actions
+    }
+    #endregion
 }
+*/
