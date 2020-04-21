@@ -44,7 +44,7 @@ public class Unit : MonoBehaviour
     /// <summary>
     /// Player of the unit
     /// </summary>
-    private UnityEngine.Color PlayerColor;
+    private Player Player;
 
     #endregion
 
@@ -92,9 +92,9 @@ public class Unit : MonoBehaviour
     {
         retreiveSceneComponents();
         assertUserDefinedValues();
-        if (PlayerColor != null)
+        if (Player != null)
         {
-            ApplyPlayerColor(PlayerColor);
+            ApplyPlayerColor(Player.UnitColor);
         }
         else
         {
@@ -108,10 +108,16 @@ public class Unit : MonoBehaviour
 
     }
 
-    public void SetPlayerColor(UnityEngine.Color ai_playerColor)
+    public void SetPlayer(Player ai_player)
     {
-        PlayerColor = ai_playerColor;     
+        Player = ai_player;     
     }
+
+    public Player GetPlayer()
+    {
+        return this.Player;
+    }
+
 
     /// <summary>
     /// Retreives components in the scene
@@ -188,7 +194,10 @@ public class Unit : MonoBehaviour
        ChangeSpritesColor(HighlightedColor);
     }
 
-
+    public void Kill()
+    {
+        Destroy(gameObject);
+    }
 
     /// <summary>
     /// Disable the unit
@@ -196,7 +205,7 @@ public class Unit : MonoBehaviour
     public void Disable()
     {
         m_disabled = true;
-
+        ApplyDisabledColor();
     }
     #endregion
 
@@ -230,18 +239,14 @@ public class Unit : MonoBehaviour
         return m_gridPosition;
     }
 
-    public void moveTo(Point ai_newPosition) { 
-
+    public IEnumerator moveTo(Point ai_newPosition) {
         // deplacement
-        StartCoroutine(StartMovement(ai_newPosition));
-        
-        // storring position in grid
-        m_gridPosition = ai_newPosition;
+        yield return StartMovement(ai_newPosition);
 
-        // unit has conumes its move
         m_hasMoved = true;
-        
-        //ResetVisualEffects();
+
+        // storing position in grid
+        m_gridPosition = ai_newPosition;    
     }
   
 
@@ -283,6 +288,7 @@ public class Unit : MonoBehaviour
         Array.ForEach(m_renderers, sprite => sprite.color = ai_color);       
     }
 
+
     private IEnumerator StartMovement(Point ai_newPosition)
     {
         // start walking animation
@@ -291,7 +297,7 @@ public class Unit : MonoBehaviour
         float w_targetPositionX = transform.position.x + (ai_newPosition.X - m_gridPosition.X);
         float w_targetPositionY = transform.position.y + (ai_newPosition.Y - m_gridPosition.Y);
         
-        // turn sprite in 
+        // turn sprite in proper direction
         SetDirection(transform.position.x < w_targetPositionX);
         
         yield return MoveHorizontally(w_targetPositionX);
@@ -299,6 +305,10 @@ public class Unit : MonoBehaviour
         
         // stop walkin annimation
         m_anim.SetBool(UnityAnimationTags.IsWalking, false);
+    }
+
+    public void ApplyDisabledColor()
+    {
         ChangeSpritesColor(DisabledColor);
     }
 

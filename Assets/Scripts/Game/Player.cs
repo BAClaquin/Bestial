@@ -17,7 +17,7 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Array.ForEach(Units, Unit => Unit.SetPlayerColor(UnitColor));
+        Array.ForEach(Units, Unit => Unit.SetPlayer(this));
     }
 
     // Update is called once per frame

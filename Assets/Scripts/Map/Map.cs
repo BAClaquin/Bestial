@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Drawing;
 using System;
+using System.Linq;
 
 public class Map : MonoBehaviour
 {
@@ -54,12 +55,43 @@ public class Map : MonoBehaviour
     public void DisplayAvailableMoves(Unit ai_unit)
     {
         // the tile of the unit
-        List<Tile> w_unitTile = new List<Tile>();
-        w_unitTile.Add(m_tileMap[ai_unit.getGridPosition().X, ai_unit.getGridPosition().Y]);
+        List<Tile> w_unitTile = new List<Tile>(); // TODO : ask why we need a list here ??
+        w_unitTile.Add(m_tileMap[ai_unit.getGridPosition().X, ai_unit.getGridPosition().Y]); 
+
         // all accessible tiles
         List<Tile> w_allTilesAccessible = new List<Tile>();
         // compute and mark all accessible tiles for this unit
         computeAccessibleTiles(ai_unit, ai_unit.MovementRange, w_unitTile, w_allTilesAccessible);
+    }
+
+    public void removeUnit(Unit unit)
+    {
+        m_listOfUnits.Remove(unit);
+    }
+
+    public List<Unit> DisplayAvailableTargets(Player ai_currentPlayer, Unit ai_unit)
+    {
+        List<Point> attackablePoints = getPositionsWithin(new Point(ai_unit.getGridPosition().X, ai_unit.getGridPosition().Y), 1);
+        List<Unit> attackableUnits = new List<Unit>();
+        List<Tile> attackableTiles = attackablePoints
+            .FindAll(point => { // find all attackable tiles where there are ennemy units
+                Unit w_unitOnCase = m_listOfUnits.FirstOrDefault(unit => unit.getGridPosition() == point && !unit.GetPlayer().Equals(ai_currentPlayer)); // ennemy unit on point
+                if(w_unitOnCase != null)
+                {
+                    attackableUnits.Add(w_unitOnCase);
+                    return true;
+                }
+                return false;                
+            })
+            .Select(point => m_tileMap[point.X, point.Y]) // get tile from point
+            .ToList();
+        SetTilesAsAttackable(attackableTiles);        
+        return attackableUnits;
+    }
+
+    private void SetTilesAsAttackable(List<Tile> attackableTiles)
+    {
+        attackableTiles.ForEach(tile => tile.SetAsAttackable());
     }
 
     /// <summary>

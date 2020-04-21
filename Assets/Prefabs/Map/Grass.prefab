@@ -98,6 +98,7 @@ MonoBehaviour:
   AccessibleFieldOfOperation: 0000000002000000
   AccessibleUnitType: 0000000001000000
   MovePossibleColor: {r: 0, g: 1, b: 0.07363963, a: 1}
+  AttackPossibleColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!61 &6821395916331277358
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -120,10 +121,6 @@ BoxCollider2D:
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
-  m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 2.23, y: 2.23}
-  m_EdgeRadius: 0
   m_AutoTiling: 0
   serializedVersion: 2
   m_Size: {x: 2.23, y: 2.23}
