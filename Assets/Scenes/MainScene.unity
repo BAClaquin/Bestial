@@ -11200,7 +11200,7 @@ PrefabInstance:
     - target: {fileID: 3830451486601764411, guid: cdad1ac764463664fb92944f0b89523a,
         type: 3}
       propertyPath: MovingCost
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cdad1ac764463664fb92944f0b89523a, type: 3}

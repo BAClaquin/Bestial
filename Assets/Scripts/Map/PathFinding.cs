@@ -249,14 +249,8 @@ public class PathFinding
                 w_pfTile.Tile.isAccessibleForUnitType(ai_unit) && // tile is accessible for this type of unit
                 w_pfTile.Status == PathFindingStatus.NONE ) // tile has not already been processed
             {
-                // new accessible tile : set as first element found
-                if(!w_found)
-                {
-                    w_found = true;
-                    ao_result = w_pfTile;
-                }
-                // new element found, select it if it is nearer previously tile found
-                else if (w_pfTile.Tile.MovingCost <= ao_result.Tile.MovingCost)
+                if(!w_found || // new accessible tile : set as first element found
+                    w_pfTile.Tile.MovingCost <= ao_result.Tile.MovingCost)  // new element found, select it if it is nearer previously tile found
                 {
                     w_found = true;
                     ao_result = w_pfTile;
