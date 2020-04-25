@@ -320,8 +320,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   FieldOfOperation: 0
   UnitType: 0
-  MovementRange: 12
-  MoveSpeed: 11
+  MovementRange: 8
+  MoveSpeed: 4
   HighlightedColor: {r: 1, g: 1, b: 1, a: 0.7294118}
   DisabledColor: {r: 0.5294118, g: 0.5294118, b: 0.5294118, a: 1}
 --- !u!212 &2085508483

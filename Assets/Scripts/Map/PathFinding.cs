@@ -232,6 +232,7 @@ public class PathFinding
     private bool selectNearestNeighbourWhereUnitCanMove(Unit ai_unit, List<PathFindingTile> ai_from, out PathFindingTile ao_result)
     {
         bool w_found = false;
+        ao_result = new PathFindingTile();
 
         // check for tiles available
         if (ai_from.Count <= 0)
@@ -240,19 +241,26 @@ public class PathFinding
             return w_found;
         }
 
-        // set min as first element
-        ao_result = ai_from[0];
 
         // browse all given tiles
-        foreach(PathFindingTile w_pfTile in ai_from)
+        foreach (PathFindingTile w_pfTile in ai_from)
         {
             if( m_pfMap.IsPositionFree(w_pfTile.Tile.getGridPosition()) && // tile is free (no other thing on it)
                 w_pfTile.Tile.isAccessibleForUnitType(ai_unit) && // tile is accessible for this type of unit
-                w_pfTile.Tile.MovingCost <= ao_result.Tile.MovingCost && // tiles is nearest of a prviously one found
                 w_pfTile.Status == PathFindingStatus.NONE ) // tile has not already been processed
             {
-                w_found = true;
-                ao_result = w_pfTile;
+                // new accessible tile : set as first element found
+                if(!w_found)
+                {
+                    w_found = true;
+                    ao_result = w_pfTile;
+                }
+                // new element found, select it if it is nearer previously tile found
+                else if (w_pfTile.Tile.MovingCost <= ao_result.Tile.MovingCost)
+                {
+                    w_found = true;
+                    ao_result = w_pfTile;
+                }
             }
         }
 
