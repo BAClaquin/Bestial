@@ -8,10 +8,11 @@ using System.Diagnostics;
 /// </summary>
 public enum TraceLevel
 {
-    ERROR,
-    WARNING,
-    INFO,
-    DEBUG
+    ERROR, // When something wrong should not happen
+    WARNING, // when something is dangerous but game can continue
+    INFO1, // 1st level of information (High Level Info)
+    INFO2, // 2nd level of information (More Detailed Information)
+    DEBUG // Debug information when needed
 }
 
 public class Tracer : MonoBehaviour
@@ -32,6 +33,7 @@ public class Tracer : MonoBehaviour
     private static StackTrace m_stackTrace;
     #endregion
 
+    #region Singleton
     /// <summary>
     /// Singleton static acces for instance
     /// </summary>
@@ -51,12 +53,13 @@ public class Tracer : MonoBehaviour
             return m_instance;
         }
     }
+    #endregion
 
+    #region Public Functions
     /// <summary>
     /// If trace level is suffiscient to be displayed, displays the trace
     /// </summary>
     /// <param name="ai_level">Level of importance of the trace</param>
-    /// <param name="ai_caller">Class + Function of the caller</param>
     /// <param name="ai_msg">Message to display</param>
     public void Trace(TraceLevel ai_level, string ai_msg)
     {
@@ -73,4 +76,5 @@ public class Tracer : MonoBehaviour
         }
         // else trace level not displayed
     }
+    #endregion
 }

@@ -6,6 +6,14 @@ using UnityEngine.UI;
 
 
 /// <summary>
+/// Interfaces provided for game information and action request
+/// </summary>
+public interface IGame
+{
+
+}
+
+/// <summary>
 /// Global Game Manager where you can manage Games
 /// </summary>
 public class Game : MonoBehaviour
@@ -53,7 +61,7 @@ public class Game : MonoBehaviour
         }
 
         NextTurn();
-        Tracer.Instance.Trace(TraceLevel.INFO, "Game started !");
+        Tracer.Instance.Trace(TraceLevel.INFO1, "Game started !");
 
     }
 
