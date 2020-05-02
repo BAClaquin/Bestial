@@ -49,7 +49,26 @@ public class State<StateEnum> where StateEnum : System.Enum
     }
     #endregion
 
-    #region Public Functions
+    #region Public 
+    /// <summary>
+    /// Tells if the current state has the same ID as the other
+    /// </summary>
+    /// <param name="ai_other">other state to compare to</param>
+    /// <returns>True if same ID, false otherwise</returns>
+    public bool IsSameState(State<StateEnum> ai_other)
+    {
+        return ID.Equals(ai_other.ID);
+    }
+
+    /// <summary>
+    /// State ID as a string
+    /// </summary>
+    /// <returns>result string</returns>
+    public override string ToString()
+    {
+        return ID.ToString();
+    }
+
     /// <summary>
     ///  Add a function that will be called on enter of the state
     /// </summary>
@@ -68,7 +87,7 @@ public class State<StateEnum> where StateEnum : System.Enum
     /// </summary>
     public void OnEnter()
     {
-        Tracer.Instance.Trace(TraceLevel.INFO2, "Entering state" + ID.ToString());
+        Tracer.Instance.Trace(TraceLevel.INFO2, "Entering state" + ToString());
         // if a function has been set, call it
         m_onEnterDelegate?.Invoke(m_game);
     }
@@ -91,7 +110,7 @@ public class State<StateEnum> where StateEnum : System.Enum
     /// </summary>
     public void OnState()
     {
-        Tracer.Instance.Trace(TraceLevel.DEBUG, "On state" + ID.ToString());
+        Tracer.Instance.Trace(TraceLevel.DEBUG, "On state" + ToString());
         // if a function has been set, call it
         m_onStateDelegate?.Invoke(m_game);
     }
@@ -114,7 +133,7 @@ public class State<StateEnum> where StateEnum : System.Enum
     /// </summary>
     public void OnLeave()
     {
-        Tracer.Instance.Trace(TraceLevel.INFO2, "Leaving state " + ID.ToString());
+        Tracer.Instance.Trace(TraceLevel.INFO2, "Leaving state " + ToString());
         // if a function has been set, call it
         m_onLeaveDelegate?.Invoke(m_game);
     }

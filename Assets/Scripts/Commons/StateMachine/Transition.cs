@@ -54,7 +54,7 @@ public class Transition<StateEnum>
     /// <returns>True if FROM and TO are the same, false otherwise</returns>
     public bool isSameTransition(Transition<StateEnum> ai_other)
     {
-        return From.ID.Equals(ai_other.From.ID) && To.ID.Equals(ai_other.To.ID);
+        return From.IsSameState(ai_other.From) && To.IsSameState(ai_other.To);
     }
 
     /// <summary>
@@ -63,7 +63,7 @@ public class Transition<StateEnum>
     /// <returns>Result of description</returns>
     public override string ToString()
     {
-        return "{Transition from " + From.ID.ToString() + " to " + To.ID.ToString() +"}";
+        return "{Transition from " + From.ToString() + " to " + To.ToString() +"}";
     }
 
     /// <summary>
@@ -73,11 +73,11 @@ public class Transition<StateEnum>
     public bool evaluateCondition()
     {
         // check if current state matching start state
-        if( ! m_internalStateMachine.getCurrentState().ID.Equals(From.ID) )
+        if( ! m_internalStateMachine.getCurrentState().IsSameState(From) )
         {
             // should not happen if stateMachine correctly implemented
-            Tracer.Instance.Trace(TraceLevel.ERROR, "Evaluating transition from state " + m_internalStateMachine.getCurrentState().ID.ToString()
-                   + "but this transition starts from state " + From.ID.ToString());
+            Tracer.Instance.Trace(TraceLevel.ERROR, "Evaluating transition from state " + m_internalStateMachine.getCurrentState().ToString()
+                   + "but this transition starts from state " + From.ToString());
             return false;
         }
 

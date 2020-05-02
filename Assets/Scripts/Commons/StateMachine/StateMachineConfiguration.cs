@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
 
-public class StateMachineConfiguration<StateEnum, TransitionEnum>
+public class StateMachineConfiguration<StateEnum>
     where StateEnum : System.Enum
-    where TransitionEnum : System.Enum
 {
     #region Members
     /// <summary>
@@ -53,9 +52,9 @@ public class StateMachineConfiguration<StateEnum, TransitionEnum>
         // check if states isn't already here
         foreach(var state in m_states)
         {
-            if ( state.ID.Equals( ai_state.ID ) )
+            if ( state.IsSameState( ai_state ) )
             {
-                throw new System.Exception("State " + ai_state.ID.ToString() + " already exists for this configuration");
+                throw new System.Exception("State " + ai_state.ToString() + " already exists for this configuration");
             }
         }
         m_states.Add(ai_state);
@@ -116,6 +115,28 @@ public class StateMachineConfiguration<StateEnum, TransitionEnum>
         }
         // all good
         return true;
+    }
+
+    /// <summary>
+    /// Provides all transition starting from a specific state
+    /// </summary>
+    /// <param name="ai_state">The state you want tto start from</param>
+    /// <returns>All transitions found</returns>
+    public List<Transition<StateEnum>> getAllTransitionsFrom(State<StateEnum> ai_state)
+    {
+        List<Transition<StateEnum>> w_result = new List<Transition<StateEnum>>();
+
+        // browse all transitions
+        foreach(var transition in m_transitions)
+        {
+            // if the transitions starts from the desired state add it to result list
+            if(transition.From.IsSameState(ai_state))
+            {
+                w_result.Add(transition);
+            }
+        }
+
+        return w_result;
     }
     #endregion
 }
