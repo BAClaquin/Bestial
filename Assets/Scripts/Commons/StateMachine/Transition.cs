@@ -96,6 +96,8 @@ public class Transition<StateEnum>
         {
             Tracer.Instance.Trace(TraceLevel.WARNING, "On transition delegate function has already been set. It will be replaced by this new one.");
         }
+
+        m_onTransitionDelegate = ai_delegate;
     }
 
     /// <summary>

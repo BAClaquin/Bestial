@@ -81,6 +81,7 @@ public class StateMachine<StateEnum> : IInternalStateMachine<StateEnum>, IStateM
         m_configuration = ai_configuration;
         m_currentState = m_configuration.getStartState();
         m_isStarted = false;
+        m_metadata = ai_metadata;
     }
     #endregion
 
