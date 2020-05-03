@@ -5,35 +5,41 @@ using UnityEngine;
 using UnityEngine.Rendering;
 
 // Operation that can be called during a state
-public delegate bool StateOperationDelegate(IGame ai_game);
+public delegate bool StateOperationDelegate<TStateMachineWorker>(IGame ai_game, TStateMachineWorker ai_worker);
 
-public class State<StateEnum> where StateEnum : System.Enum
+public class State<TStateEnum, TStateMachineWorker>
+    where TStateEnum : System.Enum
+    where TStateMachineWorker : IStateMachineWorker
 {
     #region Members
-    public StateEnum ID { get; private set; }
+    public TStateEnum ID { get; private set; }
     #endregion
 
     #region Private Members
     /// <summary>
     /// Will be called when entering the state
     /// </summary>
-    StateOperationDelegate m_onEnterDelegate;
+    StateOperationDelegate<TStateMachineWorker> m_onEnterDelegate;
     /// <summary>
     /// Will be called during the state
     /// </summary>
-    StateOperationDelegate m_onStateDelegate;
+    StateOperationDelegate<TStateMachineWorker> m_onStateDelegate;
     /// <summary>
     /// Will be called when leaving the state
     /// </summary>
-    StateOperationDelegate m_onLeaveDelegate;
+    StateOperationDelegate<TStateMachineWorker> m_onLeaveDelegate;
     /// <summary>
     /// Internal state machine provides functions regarding state maching status
     /// </summary>
-    IInternalStateMachine<StateEnum> m_internalStateMachine;
+    IInternalStateMachine<TStateEnum,TStateMachineWorker> m_internalStateMachine;
     /// <summary>
     /// Provides game status
     /// </summary>
     IGame m_game;
+    /// <summary>
+    /// Class to work with a state machien
+    /// </summary>
+    TStateMachineWorker m_worker;
     #endregion
 
     #region Constructors
@@ -41,11 +47,12 @@ public class State<StateEnum> where StateEnum : System.Enum
     /// Constructor for Abstract State
     /// </summary>
     /// <param name="ai_id">ID of the state</param>
-    public State(StateEnum ai_id, IInternalStateMachine<StateEnum> ai_stateMachine, IGame ai_game)
+    public State(TStateEnum ai_id, IInternalStateMachine<TStateEnum, TStateMachineWorker> ai_stateMachine, IGame ai_game, TStateMachineWorker ai_worker)
     {
         ID = ai_id;
         m_internalStateMachine = ai_stateMachine;
         m_game = ai_game;
+        m_worker = ai_worker;
     }
     #endregion
 
@@ -55,7 +62,7 @@ public class State<StateEnum> where StateEnum : System.Enum
     /// </summary>
     /// <param name="ai_other">other state to compare to</param>
     /// <returns>True if same ID, false otherwise</returns>
-    public bool IsSameState(State<StateEnum> ai_other)
+    public bool IsSameState(State<TStateEnum, TStateMachineWorker> ai_other)
     {
         return ID.Equals(ai_other.ID);
     }
@@ -73,7 +80,7 @@ public class State<StateEnum> where StateEnum : System.Enum
     ///  Add a function that will be called on enter of the state
     /// </summary>
     /// <param name="ai_delegate">function to call</param>
-    public void SetOnEnterFuntion(StateOperationDelegate ai_delegate)
+    public void SetOnEnterFuntion(StateOperationDelegate<TStateMachineWorker> ai_delegate)
     {
         if (m_onEnterDelegate != null)
         {
@@ -89,14 +96,14 @@ public class State<StateEnum> where StateEnum : System.Enum
     {
         Tracer.Instance.Trace(TraceLevel.INFO2, "Entering state" + ToString());
         // if a function has been set, call it
-        m_onEnterDelegate?.Invoke(m_game);
+        m_onEnterDelegate?.Invoke(m_game, m_worker);
     }
 
     /// <summary>
     ///  Adds a function that will be called on enter of the state
     /// </summary>
     /// <param name="ai_delegate">function to call</param>
-    public void SetOnStateFunction(StateOperationDelegate ai_delegate)
+    public void SetOnStateFunction(StateOperationDelegate<TStateMachineWorker> ai_delegate)
     {
         if (m_onStateDelegate != null)
         {
@@ -112,14 +119,14 @@ public class State<StateEnum> where StateEnum : System.Enum
     {
         Tracer.Instance.Trace(TraceLevel.DEBUG, "On state" + ToString());
         // if a function has been set, call it
-        m_onStateDelegate?.Invoke(m_game);
+        m_onStateDelegate?.Invoke(m_game, m_worker);
     }
 
     /// <summary>
     ///  Adds a function that will be called on enter of the state
     /// </summary>
     /// <param name="ai_delegate">function to call</param>
-    public void SetOnLeaveFunction(StateOperationDelegate ai_delegate)
+    public void SetOnLeaveFunction(StateOperationDelegate<TStateMachineWorker> ai_delegate)
     {
         if (m_onLeaveDelegate != null)
         {
@@ -135,7 +142,7 @@ public class State<StateEnum> where StateEnum : System.Enum
     {
         Tracer.Instance.Trace(TraceLevel.INFO2, "Leaving state " + ToString());
         // if a function has been set, call it
-        m_onLeaveDelegate?.Invoke(m_game);
+        m_onLeaveDelegate?.Invoke(m_game, m_worker);
     }
     #endregion
 }

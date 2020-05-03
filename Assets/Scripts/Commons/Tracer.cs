@@ -63,6 +63,7 @@ public class Tracer : MonoBehaviour
         string w_callerClass = w_methodInfo.ReflectedType.Name;
 
         // display trace by order of importance
+
         if (Level >= ai_level)
         {
             print(  "[" + ai_level.ToString() + "]" +

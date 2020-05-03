@@ -27,32 +27,34 @@ public interface IStateMachine
 /// <summary>
 /// Interface destinated to members of the state machine to acces state machine data
 /// </summary>
-public interface IInternalStateMachine<StateEnum>
-    where StateEnum : System.Enum
+public interface IInternalStateMachine<TStateEnum, TStateMachineWorker>
+    where TStateEnum : System.Enum
+    where TStateMachineWorker : IStateMachineWorker
 {
     /// <summary>
     /// Provides current state of the stateMachine
     /// </summary>
     /// <returns>The current state</returns>
-    State<StateEnum> getCurrentState();
+    State<TStateEnum, TStateMachineWorker> getCurrentState();
 }
 
 /// <summary>
 /// State Machine
 /// </summary>
-public class StateMachine<StateEnum> : IInternalStateMachine<StateEnum>, IStateMachine
-    where StateEnum : System.Enum
+public class StateMachine<TStateEnum, TStateMachineWorker> : IInternalStateMachine<TStateEnum, TStateMachineWorker>, IStateMachine
+    where TStateEnum : System.Enum
+    where TStateMachineWorker : IStateMachineWorker
 {
     #region Private Members
     /// <summary>
     /// Current state of the state machine
     /// </summary>
-    State<StateEnum> m_currentState;
+    State<TStateEnum, TStateMachineWorker> m_currentState;
 
     /// <summary>
     /// Configuration of states and transition for the state machine
     /// </summary>
-    StateMachineConfiguration<StateEnum> m_configuration;
+    StateMachineConfiguration<TStateEnum,TStateMachineWorker> m_configuration;
 
     /// <summary>
     /// Is state machine started
@@ -62,12 +64,12 @@ public class StateMachine<StateEnum> : IInternalStateMachine<StateEnum>, IStateM
     /// <summary>
     /// State machine external metadata
     /// </summary>
-    IStateMachineMetadata m_metadata;
+    IStateMachineWorker m_worker;
 
     /// <summary>
     /// Eligible transitions for current state
     /// </summary>
-    List<Transition<StateEnum>> m_eligibleTransitions;
+    List<Transition<TStateEnum, TStateMachineWorker>> m_eligibleTransitions;
     #endregion
 
     #region Constructors
@@ -75,22 +77,27 @@ public class StateMachine<StateEnum> : IInternalStateMachine<StateEnum>, IStateM
     ///  Constructor for state machine
     /// </summary>
     /// <param name="ai_configuration">COndigfuration of states and transitions</param>
-    /// <param name="ai_metadata">External metadata the state machine can work with</param>
-    public StateMachine(StateMachineConfiguration<StateEnum> ai_configuration, IStateMachineMetadata ai_metadata)
+    /// <param name="ai_worker">External worker the state machine can work with</param>
+    public StateMachine(TStateMachineWorker ai_worker)
     {
-        m_configuration = ai_configuration;
+
         m_currentState = m_configuration.getStartState();
         m_isStarted = false;
-        m_metadata = ai_metadata;
+        m_worker = ai_worker;
     }
     #endregion
 
     #region Public Functions
+    public void setConfiguration(StateMachineConfiguration<TStateEnum, TStateMachineWorker> ai_configuration)
+    {
+        m_configuration = ai_configuration;
+    }
+
     /// <summary>
     /// Provides current state of the stateMachine
     /// </summary>
     /// <returns>The current state</returns>
-    public State<StateEnum> getCurrentState()
+    public State<TStateEnum, TStateMachineWorker> getCurrentState()
     {
         return m_currentState;
     }
@@ -111,7 +118,7 @@ public class StateMachine<StateEnum> : IInternalStateMachine<StateEnum>, IStateM
         // start state machine
         m_isStarted = true;
         SetCurrentState(m_configuration.getStartState());
-        m_metadata.reset();
+        m_worker.reset();
     }
 
     /// <summary>
@@ -136,7 +143,7 @@ public class StateMachine<StateEnum> : IInternalStateMachine<StateEnum>, IStateM
         m_currentState.OnState();
 
         // see if one transition is possible
-        Transition<StateEnum> w_transitionToExecute = LookForPossibleTransition(m_eligibleTransitions);
+        Transition<TStateEnum, TStateMachineWorker> w_transitionToExecute = LookForPossibleTransition(m_eligibleTransitions);
         // if not : end for this computeState
         if(w_transitionToExecute == null) { return; }
 
@@ -151,15 +158,15 @@ public class StateMachine<StateEnum> : IInternalStateMachine<StateEnum>, IStateM
     /// Calls onEnter function for this state
     /// </summary>
     /// <param name="ai_state">Current state to set</param>
-    private void SetCurrentState(State<StateEnum> ai_state)
+    private void SetCurrentState(State<TStateEnum, TStateMachineWorker> ai_state)
     {
         m_currentState = ai_state;
         // execute state enter function
         m_currentState.OnEnter();
-        // look for eleigible transitions for this state
+        // update eleigible transitions
         m_eligibleTransitions = m_configuration.getAllTransitionsFrom(m_currentState);
 
-        Tracer.Instance.Trace(TraceLevel.INFO1, "Current state is " + m_currentState.ToString());
+        Tracer.Instance.Trace(TraceLevel.INFO1, "{"+m_configuration.StateMachineName + "} Current state is " + m_currentState.ToString());
     }
 
     /// <summary>
@@ -167,7 +174,7 @@ public class StateMachine<StateEnum> : IInternalStateMachine<StateEnum>, IStateM
     /// </summary>
     /// <param name="ai_eligibleTransitions">Transitions you want to test</param>
     /// <returns>A traistion if one foud, null otherwise</returns>
-    private Transition<StateEnum> LookForPossibleTransition(List<Transition<StateEnum>> ai_eligibleTransitions)
+    private Transition<TStateEnum, TStateMachineWorker> LookForPossibleTransition(List<Transition<TStateEnum, TStateMachineWorker>> ai_eligibleTransitions)
     {
         foreach(var transition in ai_eligibleTransitions)
         {
@@ -187,21 +194,21 @@ public class StateMachine<StateEnum> : IInternalStateMachine<StateEnum>, IStateM
     /// Enters new current state with OnEnter action called
     /// </summary>
     /// <param name="ai_transition">The transition to execute</param>
-    private void ExecuteTransition(Transition<StateEnum> ai_transition)
+    private void ExecuteTransition(Transition<TStateEnum, TStateMachineWorker> ai_transition)
     {
         // precondition
-        if(m_currentState.IsSameState(ai_transition.From))
+        if(m_currentState.ID.Equals(ai_transition.From))
         {
             Tracer.Instance.Trace(TraceLevel.WARNING, "Atempting a transition from state " + ai_transition.From.ToString() + " when current state id " + m_currentState.ToString());
             return;
         }
 
         // execute state leave
-        ai_transition.From.OnLeave();
+        m_configuration.getStateByID(ai_transition.From).OnLeave();
         // execute transition action
         ai_transition.CallTransitionAction();
         // set the new reached state
-        SetCurrentState(ai_transition.To);
+        SetCurrentState( m_configuration.getStateByID(ai_transition.To) );
     }
     #endregion
 }

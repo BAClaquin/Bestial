@@ -2,47 +2,51 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public delegate bool EvaluateConditionDelegate<StateEnum>(IInternalStateMachine<StateEnum> ai_stateMachine, IGame ai_game) where StateEnum : System.Enum;
+public delegate bool EvaluateConditionDelegate<TStateMachineWorker>(TStateMachineWorker ai_worker, IGame ai_game)
+    where TStateMachineWorker : IStateMachineWorker;
 
-public delegate void OnTransitionDelegate(IGame ai_game);
+public delegate void OnTransitionDelegate<TStateMachineWorker>(TStateMachineWorker ai_worker, IGame ai_game) where TStateMachineWorker : IStateMachineWorker;
 
-public class Transition<StateEnum>
-    where StateEnum : System.Enum
+public class Transition<TStateEnum, TStateMachineWorker>
+    where TStateEnum : System.Enum
+    where TStateMachineWorker : IStateMachineWorker
 {
     #region Condition for transition
     /// <summary>
     /// Externally provided condition to test if transition is possible
     /// </summary>
-    EvaluateConditionDelegate<StateEnum> m_conditionDelegate;
+    EvaluateConditionDelegate<TStateMachineWorker> m_conditionDelegate;
     #endregion
 
     #region Members
     /// <summary>
     /// State to transit from
     /// </summary>
-    public State<StateEnum> From { get; private set; }
+    public TStateEnum From { get; private set; }
     /// <summary>
     /// State to transit to
     /// </summary>
-    public State<StateEnum> To { get; private set; }
+    public TStateEnum To { get; private set; }
     #endregion
 
     #region Private Members
-    IInternalStateMachine<StateEnum> m_internalStateMachine;
+    IInternalStateMachine<TStateEnum, TStateMachineWorker> m_internalStateMachine;
     IGame m_game;
-    OnTransitionDelegate m_onTransitionDelegate;
+    TStateMachineWorker m_worker;
+    OnTransitionDelegate<TStateMachineWorker> m_onTransitionDelegate;
     #endregion
 
     #region Constructors
-    public Transition(State<StateEnum> ai_from, State<StateEnum> ai_to,
-        EvaluateConditionDelegate<StateEnum> ai_conditionFunction,
-        IInternalStateMachine<StateEnum> ai_stateMachine, IGame ai_game)
+    public Transition(TStateEnum ai_from, TStateEnum ai_to,
+        EvaluateConditionDelegate<TStateMachineWorker> ai_conditionFunction,
+        IInternalStateMachine<TStateEnum, TStateMachineWorker> ai_stateMachine, IGame ai_game, TStateMachineWorker ai_worker)
     {
         From = ai_from;
         To = ai_to;
         m_conditionDelegate = ai_conditionFunction;
         m_internalStateMachine = ai_stateMachine;
         m_game = ai_game;
+        m_worker = ai_worker;
     }
     #endregion
 
@@ -52,9 +56,9 @@ public class Transition<StateEnum>
     /// </summary>
     /// <param name="ai_other">other transition you wanna test equality for</param>
     /// <returns>True if FROM and TO are the same, false otherwise</returns>
-    public bool isSameTransition(Transition<StateEnum> ai_other)
+    public bool isSameTransition(Transition<TStateEnum, TStateMachineWorker> ai_other)
     {
-        return From.IsSameState(ai_other.From) && To.IsSameState(ai_other.To);
+        return From.Equals(ai_other.From) && To.Equals(ai_other.To);
     }
 
     /// <summary>
@@ -73,7 +77,7 @@ public class Transition<StateEnum>
     public bool evaluateCondition()
     {
         // check if current state matching start state
-        if( ! m_internalStateMachine.getCurrentState().IsSameState(From) )
+        if (!m_internalStateMachine.getCurrentState().ID.Equals(From) )
         {
             // should not happen if stateMachine correctly implemented
             Tracer.Instance.Trace(TraceLevel.ERROR, "Evaluating transition from state " + m_internalStateMachine.getCurrentState().ToString()
@@ -82,7 +86,7 @@ public class Transition<StateEnum>
         }
 
         // preconditions ok, test if transition is allowed
-        return m_conditionDelegate(m_internalStateMachine, m_game);
+        return m_conditionDelegate(m_worker, m_game);
     }
 
 
@@ -90,7 +94,7 @@ public class Transition<StateEnum>
     ///  Adds a function that will be called when transiting
     /// </summary>
     /// <param name="ai_delegate">function to call</param>
-    public void SetTransitionAction(OnTransitionDelegate ai_delegate)
+    public void SetTransitionAction(OnTransitionDelegate<TStateMachineWorker> ai_delegate)
     {
         if (m_onTransitionDelegate != null)
         {
@@ -106,7 +110,7 @@ public class Transition<StateEnum>
     public void CallTransitionAction()
     {
         // if a trasition action is defined call it
-        m_onTransitionDelegate?.Invoke(m_game);
+        m_onTransitionDelegate?.Invoke(m_worker, m_game);
     }
     #endregion
 }

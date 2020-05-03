@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IStateMachineMetadata
+public interface IStateMachineWorker
 {
     /// <summary>
     /// Resets all data to default value

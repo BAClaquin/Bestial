@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
 
-public class StateMachineConfiguration<StateEnum>
-    where StateEnum : System.Enum
+public class StateMachineConfiguration<TStateEnum, TStateMachineWorker>
+    where TStateEnum : System.Enum
+    where TStateMachineWorker : IStateMachineWorker
 {
     #region Members
     /// <summary>
@@ -17,15 +18,15 @@ public class StateMachineConfiguration<StateEnum>
     /// <summary>
     /// List of states
     /// </summary>
-    private List< State<StateEnum> > m_states;
+    private List< State<TStateEnum, TStateMachineWorker> > m_states;
     /// <summary>
     /// List of states
     /// </summary>
-    private List< Transition<StateEnum> > m_transitions;
+    private List< Transition<TStateEnum,TStateMachineWorker> > m_transitions;
     /// <summary>
     /// First state when statemachine is started
     /// </summary>
-    State<StateEnum> m_startState;
+    State<TStateEnum, TStateMachineWorker> m_startState;
     #endregion
 
 
@@ -37,8 +38,8 @@ public class StateMachineConfiguration<StateEnum>
     public StateMachineConfiguration(string ai_stateMachineName)
     {
         StateMachineName = ai_stateMachineName;
-        m_states = new List<State<StateEnum>>();
-        m_transitions = new List<Transition<StateEnum>>();
+        m_states = new List<State<TStateEnum, TStateMachineWorker>>();
+        m_transitions = new List<Transition<TStateEnum, TStateMachineWorker>>();
     }
     #endregion
 
@@ -47,7 +48,8 @@ public class StateMachineConfiguration<StateEnum>
     /// Adds a state to dthe configuration
     /// </summary>
     /// <param name="ai_state">State to add</param>
-    public void addState(State<StateEnum> ai_state, bool ai_isStartState = false)
+    /// <returns> The state juste added </returns>
+    public State<TStateEnum, TStateMachineWorker> addState(State<TStateEnum, TStateMachineWorker> ai_state, bool ai_isStartState = false)
     {
         // check if states isn't already here
         foreach(var state in m_states)
@@ -69,13 +71,16 @@ public class StateMachineConfiguration<StateEnum>
             }
             m_startState = ai_state;
         }
+
+        // return the last added state
+        return m_states[m_states.Count - 1];
     }
 
     /// <summary>
     /// Adds a transition to the list of possible transitions
     /// </summary>
     /// <param name="ai_transition">Transition to add</param>
-    public void addTransition(Transition<StateEnum> ai_transition)
+    public Transition<TStateEnum, TStateMachineWorker> addTransition(Transition<TStateEnum, TStateMachineWorker> ai_transition)
     {
         // check if states isn't already here
         foreach (var transition in m_transitions)
@@ -86,13 +91,16 @@ public class StateMachineConfiguration<StateEnum>
             }
         }
         m_transitions.Add(ai_transition);
+
+        // return the last added transition
+        return m_transitions[m_transitions.Count - 1];
     }
 
     /// <summary>
     /// Provides the start state
     /// </summary>
     /// <returns>state</returns>
-    public State<StateEnum> getStartState()
+    public State<TStateEnum, TStateMachineWorker> getStartState()
     {
         if(m_startState == null)
         {
@@ -122,21 +130,39 @@ public class StateMachineConfiguration<StateEnum>
     /// </summary>
     /// <param name="ai_state">The state you want tto start from</param>
     /// <returns>All transitions found</returns>
-    public List<Transition<StateEnum>> getAllTransitionsFrom(State<StateEnum> ai_state)
+    public List<Transition<TStateEnum, TStateMachineWorker>> getAllTransitionsFrom(State<TStateEnum, TStateMachineWorker> ai_state)
     {
-        List<Transition<StateEnum>> w_result = new List<Transition<StateEnum>>();
+        List<Transition<TStateEnum, TStateMachineWorker>> w_result = new List<Transition<TStateEnum, TStateMachineWorker>>();
 
         // browse all transitions
         foreach(var transition in m_transitions)
         {
             // if the transitions starts from the desired state add it to result list
-            if(transition.From.IsSameState(ai_state))
+            if(transition.From.Equals(ai_state.ID))
             {
                 w_result.Add(transition);
             }
         }
 
         return w_result;
+    }
+
+    /// <summary>
+    /// Finds a state matching and ID
+    /// </summary>
+    /// <param name="ai_id">ID you look for</param>
+    /// <returns>Foudn result</returns>
+    public State<TStateEnum, TStateMachineWorker>  getStateByID(TStateEnum ai_id)
+    {
+        foreach (var state in m_states)
+        {
+            if (state.ID.Equals(ai_id))
+            {
+                return state;
+            }
+        }
+
+        throw new System.Exception("State with ID " + ai_id.ToString() + "not found in configurtaion.");
     }
     #endregion
 }
