@@ -6,7 +6,8 @@ namespace StateMachine
 {
     public abstract class AFactory<TStateEnum, TStateMachineWorker, TEventSystem>
         where TStateEnum : System.Enum
-        where TStateMachineWorker : IStateMachineWorker
+        where TStateMachineWorker : IStateMachineWorker, new()
+        where TEventSystem : new()
     {
         #region Private Members
         StateMachine<TStateEnum, TStateMachineWorker, TEventSystem> m_stateMachine;
@@ -17,11 +18,11 @@ namespace StateMachine
         #endregion
 
         #region Constructors
-        public AFactory(TStateMachineWorker ai_worker, IGame ai_game, TEventSystem ai_eventSystem)
+        public AFactory(IGame ai_game)
         {
-            m_worker = ai_worker;
+            m_worker = new TStateMachineWorker();
             m_game = ai_game;
-            m_eventSystem = ai_eventSystem;
+            m_eventSystem = new TEventSystem();
             m_stateMachine = new StateMachine<TStateEnum, TStateMachineWorker, TEventSystem>(m_worker, m_eventSystem, m_game);
         }
         #endregion
@@ -45,7 +46,7 @@ namespace StateMachine
         /// <param name="ai_stateEnumID">Id for the state</param>
         /// <param name="ai_isStartState">is this state the start state</param>
         /// <returns>the added state</returns>
-        State<TStateEnum, TStateMachineWorker, TEventSystem> addNewState(TStateEnum ai_stateEnumID, bool ai_isStartState = false)
+        protected State<TStateEnum, TStateMachineWorker, TEventSystem> AddNewState(TStateEnum ai_stateEnumID, bool ai_isStartState = false)
         {
             return m_config.addState(new State<TStateEnum, TStateMachineWorker, TEventSystem>(ai_stateEnumID, m_stateMachine), ai_isStartState);
         }
@@ -57,7 +58,7 @@ namespace StateMachine
         /// <param name="ai_to">State ID to</param>
         /// <param name="ai_conditionFunction">Condition function for transiting</param>
         /// <returns>the added transition</returns>
-        Transition<TStateEnum, TStateMachineWorker, TEventSystem> addNewTransition(TStateEnum ai_from, TStateEnum ai_to, EvaluateConditionDelegate<TStateEnum, TStateMachineWorker, TEventSystem> ai_conditionFunction)
+        protected Transition<TStateEnum, TStateMachineWorker, TEventSystem> AddNewTransition(TStateEnum ai_from, TStateEnum ai_to, EvaluateConditionDelegate<TStateEnum, TStateMachineWorker, TEventSystem> ai_conditionFunction)
         {
             return m_config.addTransition(new Transition<TStateEnum, TStateMachineWorker, TEventSystem>(ai_from, ai_to, ai_conditionFunction, m_stateMachine));
         }

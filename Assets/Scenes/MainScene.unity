@@ -8204,9 +8204,9 @@ Transform:
   - {fileID: 113176158}
   - {fileID: 1298516928}
   - {fileID: 268859626}
+  - {fileID: 845730456}
   - {fileID: 749366287}
   - {fileID: 1446688346}
-  - {fileID: 845730456}
   - {fileID: 806359354}
   - {fileID: 1390172496}
   m_Father: {fileID: 265748627}
@@ -11196,6 +11196,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Mountain
+      objectReference: {fileID: 0}
+    - target: {fileID: 3819316807506231951, guid: cdad1ac764463664fb92944f0b89523a,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3830451486601764411, guid: cdad1ac764463664fb92944f0b89523a,
         type: 3}

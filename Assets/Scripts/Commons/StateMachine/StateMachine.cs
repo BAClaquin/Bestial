@@ -118,7 +118,6 @@ namespace StateMachine
         /// <param name="ai_worker">External worker the state machine can work with</param>
         public StateMachine(TStateMachineWorker ai_worker, TEventSystem ai_eventSystem, IGame ai_game)
         {
-            m_currentState = m_configuration.getStartState();
             m_isStarted = false;
             m_worker = ai_worker;
             m_eventSystem = ai_eventSystem;
@@ -130,6 +129,7 @@ namespace StateMachine
         public void setConfiguration(Configuration<TStateEnum, TStateMachineWorker, TEventSystem> ai_configuration)
         {
             m_configuration = ai_configuration;
+            m_currentState = m_configuration.getStartState();
         }
 
         /// <summary>
@@ -236,7 +236,7 @@ namespace StateMachine
         private void ExecuteTransition(Transition<TStateEnum, TStateMachineWorker, TEventSystem> ai_transition)
         {
             // precondition
-            if (m_currentState.ID.Equals(ai_transition.From))
+            if (!m_currentState.ID.Equals(ai_transition.From))
             {
                 Tracer.Instance.Trace(TraceLevel.WARNING, "Atempting a transition from state " + ai_transition.From.ToString() + " when current state id " + m_currentState.ToString());
                 return;

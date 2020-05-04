@@ -1,4 +1,6 @@
-﻿using System;
+﻿using GameStateMachine;
+using StateMachine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,7 +18,7 @@ public interface IGame
 /// <summary>
 /// Global Game Manager where you can manage Games
 /// </summary>
-public class Game : MonoBehaviour
+public class Game : MonoBehaviour,IGame
 {
     #region Public Unity Members
     [Header(UnityHeaders.Gameplay)]
@@ -43,6 +45,7 @@ public class Game : MonoBehaviour
 
     private int CurrentPlayerTurn = -1;
     private bool GameIsOver = false;
+    private IStateMachine<GameEventSystem> m_stateMachine;
 
     #region UI Functions
     void Start()
@@ -60,6 +63,10 @@ public class Game : MonoBehaviour
             throw new System.NullReferenceException("CurrentMap is null");
         }
 
+        Factory factory = new Factory(this);
+        m_stateMachine = factory.Create("my state machine");
+        m_stateMachine.Start();
+
         NextTurn();
         Tracer.Instance.Trace(TraceLevel.INFO1, "Game started !");
 
@@ -68,7 +75,10 @@ public class Game : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        if(m_stateMachine != null)
+        {
+            m_stateMachine.ComputeState();
+        }
     }
     #endregion
 
@@ -103,7 +113,7 @@ public class Game : MonoBehaviour
     /// <param name="ai_unit"></param>
     public void onSelectedUnit(Unit ai_unit)
     {
-
+        m_stateMachine.GetEventSystem().RaiseUnitSelctedEvent(ai_unit);
         //bool doubleClick = m_selectedUnit != null && m_selectedUnit == ai_unit && unitBelongToCurrentPlayer(ai_unit);
         //bool clickOnTargetableUnit = m_selectedUnit != null  && m_targetableUnits.Contains(ai_unit);
 

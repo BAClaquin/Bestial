@@ -54,7 +54,7 @@ namespace StateMachine
         /// This function should be call by enhariting class to indicate event received has been raised
         /// </summary>
         /// <param name="ai_eventID">Event base to raise</param>
-        private void RaiseEvent(EventBase<TEventEnum> ai_eventBase)
+        protected void RaiseEvent(EventBase<TEventEnum> ai_eventBase)
         {
             m_lastRaisedEvent = ai_eventBase;
         }
@@ -63,7 +63,7 @@ namespace StateMachine
         /// This function should be call by enhariting class to indicate event has been consumed
         /// </summary>
         /// <param name="ai_eventBase"></param>
-        private void ConsumeEvent(EventBase<TEventEnum> ai_eventBase)
+        protected void ConsumeEvent(EventBase<TEventEnum> ai_eventBase)
         {
             if(m_lastRaisedEvent.ID.Equals(ai_eventBase.ID))
             {
@@ -78,7 +78,7 @@ namespace StateMachine
         /// <returns>true if occured and not comnsumed, false otherwise</returns>
         public bool HasEventOccured(TEventEnum ai_eventID)
         {
-            return (m_lastRaisedEvent.ID.Equals(ai_eventID) && !m_lastRaisedEvent.Consumed);
+            return m_lastRaisedEvent == null ? false : (m_lastRaisedEvent.ID.Equals(ai_eventID) && !m_lastRaisedEvent.Consumed);
         }
     }
 }
