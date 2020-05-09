@@ -180,10 +180,10 @@ public class Unit : MonoBehaviour
     private void OnMouseDown()
     {
         // no events for disbaled units
-        if (!m_disabled)
-        {
+        //if (!m_disabled)
+        //{
             m_game.onSelectedUnit(this);
-        }
+        //}
 
     }
 
@@ -240,15 +240,15 @@ public class Unit : MonoBehaviour
         return m_gridPosition;
     }
 
-    public IEnumerator moveTo(Point ai_newPosition) {
-        // deplacement
-        yield return StartMovement(ai_newPosition);
+    //public IEnumerator moveTo(Point ai_newPosition) {
+    //    // deplacement
+    //    yield return StartMovement(ai_newPosition);
 
-        m_hasMoved = true;
+    //    m_hasMoved = true;
 
-        // storing position in grid
-        m_gridPosition = ai_newPosition;    
-    }
+    //    // storing position in grid
+    //    m_gridPosition = ai_newPosition;    
+    //}
 
     public IEnumerator moveTo(List<Tile> ai_path)
     {

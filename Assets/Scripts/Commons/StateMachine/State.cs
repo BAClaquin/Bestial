@@ -14,7 +14,7 @@ namespace StateMachine
         where TStateEnum : System.Enum
         where TStateMachineWorker : IStateMachineWorker;
 
-    public class State<TStateEnum, TStateMachineWorker, TEventSystem>
+    public abstract class State<TStateEnum, TStateMachineWorker, TEventSystem>
         where TStateEnum : System.Enum
         where TStateMachineWorker : IStateMachineWorker
     {
@@ -22,7 +22,9 @@ namespace StateMachine
         public TStateEnum ID { get; private set; }
         #endregion
 
+
         #region Private Members
+        /*
         /// <summary>
         /// Will be called when entering the state
         /// </summary>
@@ -38,7 +40,8 @@ namespace StateMachine
         /// <summary>
         /// Internal state machine provides functions regarding state maching status
         /// </summary>
-        IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventSystem> m_internalStateMachine;
+        /// */
+        protected IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventSystem> m_internalStateMachine;
         #endregion
 
         #region Constructors
@@ -46,14 +49,25 @@ namespace StateMachine
         /// Constructor for Abstract State
         /// </summary>
         /// <param name="ai_id">ID of the state</param>
-        public State(TStateEnum ai_id, IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventSystem> ai_stateMachine)
+        public State(TStateEnum ai_id, StateMachine<TStateEnum, TStateMachineWorker, TEventSystem> ai_stateMachine)
         {
             ID = ai_id;
             m_internalStateMachine = ai_stateMachine;
         }
         #endregion
 
+        public State(TStateEnum ai_id)
+        {
+            ID = ai_id;
+        }
+
         #region Public 
+
+        public void setStateMachine(IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventSystem> ai_stateMachine)
+        {
+            m_internalStateMachine = ai_stateMachine;
+        }
+
         /// <summary>
         /// Tells if the current state has the same ID as the other
         /// </summary>
@@ -73,11 +87,12 @@ namespace StateMachine
             return ID.ToString();
         }
 
+        /*
         /// <summary>
         ///  Add a function that will be called on enter of the state
         /// </summary>
         /// <param name="ai_delegate">function to call</param>
-        public void SetOnEnterFuntion(StateOperationDelegate<TStateEnum, TStateMachineWorker, TEventSystem> ai_delegate)
+        public void SetOnEnterFunction(StateOperationDelegate<TStateEnum, TStateMachineWorker, TEventSystem> ai_delegate)
         {
             if (m_onEnterDelegate != null)
             {
@@ -140,6 +155,15 @@ namespace StateMachine
             Tracer.Instance.Trace(TraceLevel.INFO2, "Leaving state " + ToString());
             // if a function has been set, call it
             m_onLeaveDelegate?.Invoke(m_internalStateMachine);
+        }
+
+        */
+        public abstract void OnLeave();
+        public abstract void OnEnter();
+        public abstract void OnState();
+        public void SetInternalStateMachine(IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventSystem>  ai_internalStateMachine)
+        {
+            this.m_internalStateMachine = ai_internalStateMachine;
         }
         #endregion
     }

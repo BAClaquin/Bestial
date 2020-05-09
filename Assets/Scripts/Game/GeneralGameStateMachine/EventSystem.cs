@@ -1,23 +1,24 @@
-﻿using Assets.Scripts.Game.GeneralGameStateMachine;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace StateMachine
+namespace GameStateMachine
 {
 
     using TileSelectedEvent = StateMachine.Event<EventEnum, Tile>;
     using UnitSelectedEvent = StateMachine.Event<EventEnum, Unit>;
+    using AnimationIsOverEvent = StateMachine.Event<EventEnum, bool>;
 
-    public class GameEventSystem : SingleEventSystem<EventEnum>
+    public class EventSystem : StateMachine.SingleEventSystem<EventEnum>
     {
 
         private TileSelectedEvent m_tileSelectedEvent;
         private UnitSelectedEvent m_unitSelectedEvent;
+        private AnimationIsOverEvent m_animationIsOverEvent;
 
-        public GameEventSystem()
+        public EventSystem()
         {
         }
 
@@ -29,10 +30,16 @@ namespace StateMachine
         }
 
 
-        public void RaiseUnitSelctedEvent(Unit ai_unit)
+        public void RaiseUnitSelectedEvent(Unit ai_unit)
         {
             m_unitSelectedEvent = new UnitSelectedEvent(EventEnum.UNIT_SELECTED, ai_unit);
             RaiseEvent(m_unitSelectedEvent);
+        }
+
+        public void RaiseAnimationIsOverEvent()
+        {
+            m_animationIsOverEvent = new AnimationIsOverEvent(EventEnum.ANIMATION_IS_OVER, true);
+            RaiseEvent(m_animationIsOverEvent);
         }
 
         public Tile ConsumeTileSelectedEvent()
@@ -44,6 +51,16 @@ namespace StateMachine
         public Unit ConsumeUnitSelectedEvent()
         {
             ConsumeEvent(m_unitSelectedEvent);
+            return m_unitSelectedEvent.getAssociatedData();
+        }
+
+        public Tile getTileSelectedEventAssociatedData()
+        {
+            return m_tileSelectedEvent.getAssociatedData();
+        }
+
+        public Unit getUnitSelectedEventAssociatedData()
+        {
             return m_unitSelectedEvent.getAssociatedData();
         }
 

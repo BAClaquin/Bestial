@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 using StateMachine;
+using System;
 
 namespace GameStateMachine
 {
     public class Worker : StateMachine.IStateMachineWorker
     {
 
-        private Unit m_currentUnit;
+        public Unit m_currentUnit { get; set;}
+        public Unit m_targetUnit { get; set;}
+        public Tile m_targetTile { get; set;}
 
         public void reset()
         {
@@ -16,10 +19,6 @@ namespace GameStateMachine
             //throw new System.NotImplementedException();
         }
 
-        public void setCurrentUnit(Unit ai_currentUnit)
-        {
-            this.m_currentUnit = ai_currentUnit;
-        }
     }
 }
 

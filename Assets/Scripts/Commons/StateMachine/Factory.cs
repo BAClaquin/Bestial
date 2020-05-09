@@ -46,9 +46,15 @@ namespace StateMachine
         /// <param name="ai_stateEnumID">Id for the state</param>
         /// <param name="ai_isStartState">is this state the start state</param>
         /// <returns>the added state</returns>
-        protected State<TStateEnum, TStateMachineWorker, TEventSystem> AddNewState(TStateEnum ai_stateEnumID, bool ai_isStartState = false)
+        //protected State<TStateEnum, TStateMachineWorker, TEventSystem> AddNewState(TStateEnum ai_stateEnumID, bool ai_isStartState = false)
+        //{
+        //    return m_config.addState(new State<TStateEnum, TStateMachineWorker, TEventSystem>(ai_stateEnumID, m_stateMachine), ai_isStartState);
+        //}
+
+        protected void AddNewState(State<TStateEnum, TStateMachineWorker, TEventSystem> ai_state, bool ai_isStartState = false)
         {
-            return m_config.addState(new State<TStateEnum, TStateMachineWorker, TEventSystem>(ai_stateEnumID, m_stateMachine), ai_isStartState);
+            ai_state.SetInternalStateMachine(m_stateMachine);
+            m_config.addState(ai_state, ai_isStartState);
         }
 
         /// <summary>
