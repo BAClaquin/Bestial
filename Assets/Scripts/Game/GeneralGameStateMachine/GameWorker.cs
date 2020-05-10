@@ -6,7 +6,7 @@ using System;
 
 namespace GameStateMachine
 {
-    public class Worker : StateMachine.IStateMachineWorker
+    public class GameWorker : StateMachine.IStateMachineWorker
     {
 
         public Unit m_currentUnit { get; set;}

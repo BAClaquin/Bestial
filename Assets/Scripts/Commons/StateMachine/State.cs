@@ -24,23 +24,6 @@ namespace StateMachine
 
 
         #region Private Members
-        /*
-        /// <summary>
-        /// Will be called when entering the state
-        /// </summary>
-        StateOperationDelegate<TStateEnum, TStateMachineWorker, TEventSystem> m_onEnterDelegate;
-        /// <summary>
-        /// Will be called during the state
-        /// </summary>
-        StateOperationDelegate<TStateEnum, TStateMachineWorker, TEventSystem> m_onStateDelegate;
-        /// <summary>
-        /// Will be called when leaving the state
-        /// </summary>
-        StateOperationDelegate<TStateEnum, TStateMachineWorker, TEventSystem> m_onLeaveDelegate;
-        /// <summary>
-        /// Internal state machine provides functions regarding state maching status
-        /// </summary>
-        /// */
         protected IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventSystem> m_internalStateMachine;
         #endregion
 
@@ -87,41 +70,13 @@ namespace StateMachine
             return ID.ToString();
         }
 
-        /*
-        /// <summary>
-        ///  Add a function that will be called on enter of the state
-        /// </summary>
-        /// <param name="ai_delegate">function to call</param>
-        public void SetOnEnterFunction(StateOperationDelegate<TStateEnum, TStateMachineWorker, TEventSystem> ai_delegate)
-        {
-            if (m_onEnterDelegate != null)
-            {
-                Tracer.Instance.Trace(TraceLevel.WARNING, "On enter delegate function has already been set. It will be replaced by this new one.");
-            }
-            m_onEnterDelegate = ai_delegate;
-        }
-
         /// <summary>
         /// Is called when you enter the state for the first time
         /// </summary>
         public void OnEnter()
         {
             Tracer.Instance.Trace(TraceLevel.INFO2, "Entering state" + ToString());
-            // if a function has been set, call it
-            m_onEnterDelegate?.Invoke(m_internalStateMachine);
-        }
-
-        /// <summary>
-        ///  Adds a function that will be called on enter of the state
-        /// </summary>
-        /// <param name="ai_delegate">function to call</param>
-        public void SetOnStateFunction(StateOperationDelegate<TStateEnum, TStateMachineWorker, TEventSystem> ai_delegate)
-        {
-            if (m_onStateDelegate != null)
-            {
-                Tracer.Instance.Trace(TraceLevel.WARNING, "On state delegate function has already been set. It will be replaced by this new one.");
-            }
-            m_onStateDelegate = ai_delegate;
+            _onEnterImpl();
         }
 
         /// <summary>
@@ -130,22 +85,9 @@ namespace StateMachine
         public void OnState()
         {
             Tracer.Instance.Trace(TraceLevel.DEBUG, "On state" + ToString());
-            // if a function has been set, call it
-            m_onStateDelegate?.Invoke(m_internalStateMachine);
+            _onStateImpl();
         }
 
-        /// <summary>
-        ///  Adds a function that will be called on enter of the state
-        /// </summary>
-        /// <param name="ai_delegate">function to call</param>
-        public void SetOnLeaveFunction(StateOperationDelegate<TStateEnum, TStateMachineWorker, TEventSystem> ai_delegate)
-        {
-            if (m_onLeaveDelegate != null)
-            {
-                Tracer.Instance.Trace(TraceLevel.WARNING, "On leave delegate function has already been set. It will be replaced by this new one.");
-            }
-            m_onLeaveDelegate = ai_delegate;
-        }
 
         /// <summary>
         /// Is called when you leave the state
@@ -153,18 +95,33 @@ namespace StateMachine
         public void OnLeave()
         {
             Tracer.Instance.Trace(TraceLevel.INFO2, "Leaving state " + ToString());
-            // if a function has been set, call it
-            m_onLeaveDelegate?.Invoke(m_internalStateMachine);
+            _onLeaveImpl();
         }
 
-        */
-        public abstract void OnLeave();
-        public abstract void OnEnter();
-        public abstract void OnState();
+
+        /// <summary>
+        /// TODO : a la construction ????
+        /// </summary>
+        /// <param name="ai_internalStateMachine"></param>
         public void SetInternalStateMachine(IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventSystem>  ai_internalStateMachine)
         {
             this.m_internalStateMachine = ai_internalStateMachine;
         }
+        #endregion
+
+        #region Protected Functions
+        /// <summary>
+        ///  State specific on state impl if required
+        /// </summary>
+        protected virtual void _onStateImpl() { }
+        /// <summary>
+        ///  State specific on enter impl if required
+        /// </summary>
+        protected virtual void _onEnterImpl() { }
+        /// <summary>
+        ///  State specific on leave impl if required
+        /// </summary>
+        protected virtual void _onLeaveImpl() { }
         #endregion
     }
 }

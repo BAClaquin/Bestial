@@ -8,7 +8,7 @@ using UnityEngine;
 namespace GameStateMachine
 {
 
-    class Factory : AFactory<StateEnum, Worker, EventSystem>
+    class Factory : AFactory<GameStates, GameWorker, GameEventSytstem>
     {
 
         public Factory(IGame ai_game) : base(ai_game) { }
@@ -44,13 +44,13 @@ namespace GameStateMachine
 
         private void AddWaitGameActionTransitions()
         {
-            AddNewTransition(StateEnum.WAIT_GAME_ACTION, StateEnum.UNIT_SELECTED, WaitGameAction.toUnitSelected);
+            AddNewTransition(GameStates.WAIT_GAME_ACTION, GameStates.UNIT_SELECTED, WaitGameAction.toUnitSelected);
         }
 
         private void AddUnitSelectedTransitions()
         {
-            AddNewTransition(StateEnum.UNIT_SELECTED, StateEnum.WAIT_GAME_ACTION, UnitSelected.toWaitGameAction);
-            AddNewTransition(StateEnum.UNIT_SELECTED, StateEnum.WAIT_UNIT_ACTION_IDLE, UnitSelected.toWaitUnitActionIdle);
+            AddNewTransition(GameStates.UNIT_SELECTED, GameStates.WAIT_GAME_ACTION, UnitSelected.toWaitGameAction);
+            AddNewTransition(GameStates.UNIT_SELECTED, GameStates.WAIT_UNIT_ACTION_IDLE, UnitSelected.toWaitUnitActionIdle);
         }
 
         private void AddWaitUnitActionTransitions()
@@ -64,26 +64,26 @@ namespace GameStateMachine
             //AddNewTransition(StateEnum.WAIT_UNIT_ACTION, StateEnum.ATTACK, WaitUnitAction.toAttack);
 
             //IDLE
-            AddNewTransition(StateEnum.WAIT_UNIT_ACTION_IDLE, StateEnum.WAIT_UNIT_ACTION_UNIT_SELECTED, WaitUnitActionIdle.toWaitUnitActionUnitSelected);
-            AddNewTransition(StateEnum.WAIT_UNIT_ACTION_IDLE, StateEnum.WAIT_UNIT_ACTION_TILE_SELECTED, WaitUnitActionIdle.toWaitUnitActionTileSelected);
+            AddNewTransition(GameStates.WAIT_UNIT_ACTION_IDLE, GameStates.WAIT_UNIT_ACTION_UNIT_SELECTED, WaitUnitActionIdle.toWaitUnitActionUnitSelected);
+            AddNewTransition(GameStates.WAIT_UNIT_ACTION_IDLE, GameStates.WAIT_UNIT_ACTION_TILE_SELECTED, WaitUnitActionIdle.toWaitUnitActionTileSelected);
 
             //TILE SELECTED
-            AddNewTransition(StateEnum.WAIT_UNIT_ACTION_TILE_SELECTED, StateEnum.WAIT_GAME_ACTION, WaitUnitActionTileSelected.toWaitGameAction);
-            AddNewTransition(StateEnum.WAIT_UNIT_ACTION_TILE_SELECTED, StateEnum.MOVE_UNIT, WaitUnitActionTileSelected.toMoveUnit);
+            AddNewTransition(GameStates.WAIT_UNIT_ACTION_TILE_SELECTED, GameStates.WAIT_GAME_ACTION, WaitUnitActionTileSelected.toWaitGameAction);
+            AddNewTransition(GameStates.WAIT_UNIT_ACTION_TILE_SELECTED, GameStates.MOVE_UNIT, WaitUnitActionTileSelected.toMoveUnit);
 
             //UNIT SELECTED
-            AddNewTransition(StateEnum.WAIT_UNIT_ACTION_UNIT_SELECTED, StateEnum.UNIT_SELECTED, WaitUnitActionUnitSelected.toUnitSelected);
-            AddNewTransition(StateEnum.WAIT_UNIT_ACTION_UNIT_SELECTED, StateEnum.ATTACK, WaitUnitActionUnitSelected.toAttack);
+            AddNewTransition(GameStates.WAIT_UNIT_ACTION_UNIT_SELECTED, GameStates.UNIT_SELECTED, WaitUnitActionUnitSelected.toUnitSelected);
+            AddNewTransition(GameStates.WAIT_UNIT_ACTION_UNIT_SELECTED, GameStates.ATTACK, WaitUnitActionUnitSelected.toAttack);
         }
 
         private void AddMoveUnitTransitions()
         {
-            AddNewTransition(StateEnum.MOVE_UNIT, StateEnum.UNIT_SELECTED, MoveUnit.toUnitSelected);
+            AddNewTransition(GameStates.MOVE_UNIT, GameStates.UNIT_SELECTED, MoveUnit.toUnitSelected);
         }
 
         private void AddAttackTransitions()
         {
-            AddNewTransition(StateEnum.ATTACK, StateEnum.UNIT_SELECTED, Attack.toUnitSelected);
+            AddNewTransition(GameStates.ATTACK, GameStates.UNIT_SELECTED, Attack.toUnitSelected);
         }
 
         #endregion

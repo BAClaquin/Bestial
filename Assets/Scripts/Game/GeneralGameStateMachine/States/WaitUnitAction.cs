@@ -2,6 +2,7 @@
 using StateMachine;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -10,10 +11,10 @@ using System.Threading.Tasks;
 namespace GameStateMachine
 {
 
-    using IInternalStateMachine = IInternalStateMachine<StateEnum, Worker, EventSystem>;
-    public class WaitUnitAction : StateImpl
+    using IInternalStateMachine = IInternalStateMachine<GameStates, GameWorker, GameEventSytstem>;
+    public class WaitUnitAction : GameState
     {
-        public WaitUnitAction() : base(StateEnum.WAIT_UNIT_ACTION) { }
+        public WaitUnitAction() : base(GameStates.WAIT_UNIT_ACTION) { }
 
         public static bool toMoveUnit(IInternalStateMachine ai_internalStateMachine)
         {
@@ -61,16 +62,14 @@ namespace GameStateMachine
             return false;
         }
 
-        override
-        public void OnLeave()
-        {
-            Utils.undisplayPossibleAction(m_internalStateMachine);
-        }
-
-        override
-        public void OnEnter()
+        override protected void _onEnterImpl()
         {
             Utils.displayPossibleActions(m_internalStateMachine);
+        }
+
+        override protected void _onLeaveImpl()
+        {
+            Utils.undisplayPossibleAction(m_internalStateMachine);
         }
     }
 }

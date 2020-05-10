@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 namespace GameStateMachine
 {
 
-    using IInternalStateMachine = IInternalStateMachine<StateEnum, Worker, EventSystem>;
+    using IInternalStateMachine = IInternalStateMachine<GameStates, GameWorker, GameEventSytstem>;
 
-    public class WaitUnitActionUnitSelected : StateImpl
+    public class WaitUnitActionUnitSelected : GameState
     {
 
-        public WaitUnitActionUnitSelected() : base(StateEnum.WAIT_UNIT_ACTION_UNIT_SELECTED) { }
+        public WaitUnitActionUnitSelected() : base(GameStates.WAIT_UNIT_ACTION_UNIT_SELECTED) { }
 
         internal static bool toAttack(IInternalStateMachine ai_internalStateMachine)
         {                        
@@ -35,7 +35,7 @@ namespace GameStateMachine
         }
 
         override
-        public void OnLeave()
+        protected void _onLeaveImpl()
         {
             Utils.undisplayPossibleAction(m_internalStateMachine);
         }
