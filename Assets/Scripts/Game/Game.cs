@@ -51,7 +51,7 @@ public class Game : MonoBehaviour,IGame
 
     private int CurrentPlayerTurn = -1;
     private bool GameIsOver = false;
-    private IStateMachine<EventSystem> m_stateMachine;
+    private IStateMachine<GameEventSytstem> m_stateMachine;
 
     #region UI Functions
     void Start()

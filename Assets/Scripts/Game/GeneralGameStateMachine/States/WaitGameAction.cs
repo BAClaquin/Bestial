@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 namespace GameStateMachine
 {
 
-    using IInternalStateMachine = IInternalStateMachine<StateEnum, Worker, EventSystem>;
+    using IInternalStateMachine = IInternalStateMachine<GameStates, GameWorker, GameEventSytstem>;
 
-    public class WaitGameAction : StateImpl
+    public class WaitGameAction : GameState
     {
-        public WaitGameAction(): base(StateEnum.WAIT_GAME_ACTION) {}
+        public WaitGameAction(): base(GameStates.WAIT_GAME_ACTION) {}
 
         public static bool toUnitSelected(IInternalStateMachine ai_internalStateMachine)
         {

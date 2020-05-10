@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 namespace GameStateMachine
 {
 
-    using IInternalStateMachine = IInternalStateMachine<StateEnum, Worker, EventSystem>;
-    class WaitUnitActionTileSelected : StateImpl
+    using IInternalStateMachine = IInternalStateMachine<GameStates, GameWorker, GameEventSytstem>;
+    class WaitUnitActionTileSelected : GameState
     {
 
-        public WaitUnitActionTileSelected() : base(StateEnum.WAIT_UNIT_ACTION_TILE_SELECTED) { }
+        public WaitUnitActionTileSelected() : base(GameStates.WAIT_UNIT_ACTION_TILE_SELECTED) { }
 
         internal static bool toMoveUnit(IInternalStateMachine ai_internalStateMachine)
         {
@@ -25,7 +25,7 @@ namespace GameStateMachine
         }
 
         override
-        public void OnLeave()
+        protected void _onLeaveImpl()
         {
             Utils.undisplayPossibleAction(m_internalStateMachine);
         }

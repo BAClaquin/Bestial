@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GameStateMachine
 {
-    public enum StateEnum
+    public enum GameStates
     {
         WAIT_GAME_ACTION,
         WAIT_UNIT_ACTION_IDLE,

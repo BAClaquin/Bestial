@@ -11,14 +11,14 @@ namespace GameStateMachine
     using UnitSelectedEvent = StateMachine.Event<EventEnum, Unit>;
     using AnimationIsOverEvent = StateMachine.Event<EventEnum, bool>;
 
-    public class EventSystem : StateMachine.SingleEventSystem<EventEnum>
+    public class GameEventSytstem : StateMachine.SingleEventSystem<EventEnum>
     {
 
         private TileSelectedEvent m_tileSelectedEvent;
         private UnitSelectedEvent m_unitSelectedEvent;
         private AnimationIsOverEvent m_animationIsOverEvent;
 
-        public EventSystem()
+        public GameEventSytstem()
         {
         }
 

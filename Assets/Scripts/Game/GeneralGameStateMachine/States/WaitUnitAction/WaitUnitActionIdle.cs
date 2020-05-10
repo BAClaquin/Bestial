@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 namespace GameStateMachine
 {
 
-    using IInternalStateMachine = IInternalStateMachine<StateEnum, Worker, EventSystem>;
+    using IInternalStateMachine = IInternalStateMachine<GameStates, GameWorker, GameEventSytstem>;
 
-    public class WaitUnitActionIdle : StateImpl
+    public class WaitUnitActionIdle : GameState
     {
 
-        public WaitUnitActionIdle() : base(StateEnum.WAIT_UNIT_ACTION_IDLE) { }
+        public WaitUnitActionIdle() : base(GameStates.WAIT_UNIT_ACTION_IDLE) { }
 
         public static bool toWaitUnitActionUnitSelected(IInternalStateMachine ai_internalStateMachine)
         {
@@ -36,7 +36,7 @@ namespace GameStateMachine
         }
 
         override
-        public void OnEnter()
+        protected void _onEnterImpl()
         {
             Utils.displayPossibleActions(m_internalStateMachine);
         }

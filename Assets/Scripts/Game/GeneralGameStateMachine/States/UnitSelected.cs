@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 namespace GameStateMachine
 {
 
-    using IInternalStateMachine = IInternalStateMachine<StateEnum, Worker, EventSystem>;
+    using IInternalStateMachine = IInternalStateMachine<GameStates, GameWorker, GameEventSytstem>;
 
-    public class UnitSelected : StateImpl
+    public class UnitSelected : GameState
     {
-        public UnitSelected(): base(StateEnum.UNIT_SELECTED) {}
+        public UnitSelected(): base(GameStates.UNIT_SELECTED) {}
 
         #region transitions
 
@@ -33,7 +33,5 @@ namespace GameStateMachine
         }
 
         #endregion
-
-
     }
 }

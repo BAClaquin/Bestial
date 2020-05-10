@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 namespace GameStateMachine
 {
 
-    using IInternalStateMachine = IInternalStateMachine<StateEnum, Worker, EventSystem>;
-    public class Attack  : StateImpl
+    using IInternalStateMachine = IInternalStateMachine<GameStates, GameWorker, GameEventSytstem>;
+    public class Attack  : GameState
     {
-        public Attack() : base(StateEnum.ATTACK) { }
+        public Attack() : base(GameStates.ATTACK) { }
 
         public static bool toUnitSelected(IInternalStateMachine ai_internalStateMachine)
         {
@@ -19,7 +19,7 @@ namespace GameStateMachine
         }
 
         override
-        public void OnEnter()
+        protected void _onEnterImpl()
         {
             Utils.attackUnit(m_internalStateMachine);
         }

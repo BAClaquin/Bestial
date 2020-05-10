@@ -2,8 +2,8 @@
 
 namespace GameStateMachine
 {
-    internal class NextTurn : StateImpl
+    internal class NextTurn : GameState
     {
-        public NextTurn() : base(StateEnum.NEXT_TURN) { }
+        public NextTurn() : base(GameStates.NEXT_TURN) { }
     }
 }
