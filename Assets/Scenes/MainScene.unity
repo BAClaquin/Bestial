@@ -134,10 +134,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1642718033}
     m_Modifications:
-    - target: {fileID: 222377474, guid: c2f2602c095fe2c49ab879a5e3990a47, type: 3}
-      propertyPath: PlayerColor.a
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 8089554524920735593, guid: c2f2602c095fe2c49ab879a5e3990a47,
         type: 3}
       propertyPath: m_Name

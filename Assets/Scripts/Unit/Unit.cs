@@ -41,6 +41,8 @@ public class Unit : MonoBehaviour
     /// Color of unit when disabled
     /// </summary>
     public UnityEngine.Color DisabledColor;
+    
+    public float m_unitZAxis;
 
     /// <summary>
     /// Player of the unit
@@ -82,6 +84,8 @@ public class Unit : MonoBehaviour
     private Animator m_anim;
     private string m_coloredOutfitGameObjectTag = "playerColoredOutfit";
 
+    
+
     #endregion
 
     #region Game tags
@@ -93,6 +97,9 @@ public class Unit : MonoBehaviour
     {
         retreiveSceneComponents();
         assertUserDefinedValues();
+
+        transform.position = new Vector3(transform.position.x, transform.position.y, m_unitZAxis);
+
         if (Player != null)
         {
             ApplyPlayerColor(Player.UnitColor);
@@ -313,7 +320,6 @@ public class Unit : MonoBehaviour
         float w_targetPositionY = transform.position.y + (ai_newPosition.Y - m_gridPosition.Y);
 
         // turn sprite in proper direction
-        print(transform.position.x + " " + w_targetPositionX + " " + (transform.position.x < w_targetPositionX));
         SetDirection(transform.position.x, w_targetPositionX);
         
         yield return MoveHorizontally(w_targetPositionX);
@@ -332,7 +338,7 @@ public class Unit : MonoBehaviour
     {
         while (!IsCloseEnoughToTargetPosition(transform.position.x, ai_targetPositionX))
         {
-            transform.position = Vector3.MoveTowards(transform.position, new Vector3(ai_targetPositionX, transform.position.y, -1), MoveSpeed * Time.deltaTime);
+            transform.position = Vector3.MoveTowards(transform.position, new Vector3(ai_targetPositionX, transform.position.y, m_unitZAxis), MoveSpeed * Time.deltaTime);
             yield return null;
         }
     }
@@ -341,7 +347,7 @@ public class Unit : MonoBehaviour
     {
         while (!IsCloseEnoughToTargetPosition(transform.position.y, ai_targetPositionY))
         {
-            transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, ai_targetPositionY, -1), MoveSpeed * Time.deltaTime);
+            transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, ai_targetPositionY, m_unitZAxis), MoveSpeed * Time.deltaTime);
             yield return null;
         }
     }
