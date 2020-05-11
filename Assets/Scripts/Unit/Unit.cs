@@ -311,9 +311,10 @@ public class Unit : MonoBehaviour
         
         float w_targetPositionX = transform.position.x + (ai_newPosition.X - m_gridPosition.X);
         float w_targetPositionY = transform.position.y + (ai_newPosition.Y - m_gridPosition.Y);
-        
+
         // turn sprite in proper direction
-        SetDirection(transform.position.x < w_targetPositionX);
+        print(transform.position.x + " " + w_targetPositionX + " " + (transform.position.x < w_targetPositionX));
+        SetDirection(transform.position.x, w_targetPositionX);
         
         yield return MoveHorizontally(w_targetPositionX);
         yield return MoveVertically(w_targetPositionY);
@@ -345,9 +346,12 @@ public class Unit : MonoBehaviour
         }
     }
 
-    private void SetDirection(bool ai_shouldTurnRight)
+    private void SetDirection(float ai_positionX, float ai_targetPositionX)
     {
-        transform.eulerAngles = ai_shouldTurnRight ? new Vector3(0, 180, 0) : new Vector3(0, 0, 0);
+        if(ai_positionX != ai_targetPositionX)
+        {
+            transform.eulerAngles = ai_positionX < ai_targetPositionX ? new Vector3(0, 180, 0) : new Vector3(0, 0, 0);
+        }        
     }
 
     private bool IsCloseEnoughToTargetPosition(float ai_position, float ai_targetPosition)
