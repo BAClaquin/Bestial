@@ -41,6 +41,8 @@ public class Unit : MonoBehaviour
     /// Color of unit when disabled
     /// </summary>
     public UnityEngine.Color DisabledColor;
+    
+    public float m_unitZAxis;
 
     /// <summary>
     /// Player of the unit
@@ -70,17 +72,27 @@ public class Unit : MonoBehaviour
     /// </summary>
     private Game m_game;
     /// <summary>
-    /// Indicates if unit has played during this run
+    /// Indicates if unit has played during this turn
     /// </summary>
     private bool m_hasMoved = false;
+    /// <summary>
+    /// Indicates if unit has attacked during this turn
+    /// </summary>
+    private bool m_hasAttacked = false;
     /// <summary>
     /// When unit is disabled, no action is possible
     /// </summary>
     private bool m_disabled = false;
+    /// <summary>
+    /// When unit is disabled, no action is possible
+    /// </summary>
+    private bool m_selected = false;
 
 
     private Animator m_anim;
     private string m_coloredOutfitGameObjectTag = "playerColoredOutfit";
+
+    
 
     #endregion
 
@@ -93,6 +105,9 @@ public class Unit : MonoBehaviour
     {
         retreiveSceneComponents();
         assertUserDefinedValues();
+
+        transform.position = new Vector3(transform.position.x, transform.position.y, m_unitZAxis);
+
         if (Player != null)
         {
             ApplyPlayerColor(Player.UnitColor);
@@ -109,6 +124,15 @@ public class Unit : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Describes the unit with its caracteristics
+    /// </summary>
+    /// <returns>Description as a string</returns>
+    public string Describe()
+    {
+        return "{ Type : " + UnitType.ToString() + " | Commander : " + Player.Name + " | Number : @TODO }";
+    }
+
     public void SetPlayer(Player ai_player)
     {
         Player = ai_player;     
@@ -118,7 +142,6 @@ public class Unit : MonoBehaviour
     {
         return this.Player;
     }
-
 
     /// <summary>
     /// Retreives components in the scene
@@ -179,20 +202,24 @@ public class Unit : MonoBehaviour
     /// </summary>
     private void OnMouseDown()
     {
-        // no events for disbaled units
-        if (!m_disabled)
-        {
-            m_game.onSelectedUnit(this);
-        }
-
+        m_game.onSelectedUnit(this);
     }
 
     /// <summary>
     /// Visually highlights the unit
     /// </summary>
-    public void Highlight()
+    public void SetSelected(bool ai_selected)
     {
-       ChangeSpritesColor(HighlightedColor);
+        m_selected = ai_selected;
+        if(m_selected)
+        {
+            ChangeSpritesColor(HighlightedColor);
+        }
+        else
+        {
+            ResetColorEffects();
+        }
+
     }
 
     public void Kill()
@@ -208,6 +235,11 @@ public class Unit : MonoBehaviour
         m_disabled = true;
         ApplyDisabledColor();
     }
+
+    public bool IsDisabled()
+    {
+        return m_disabled;
+    }
     #endregion
 
     #region Public Functions
@@ -219,8 +251,9 @@ public class Unit : MonoBehaviour
         // reset played information
         m_hasMoved = false;
         m_disabled = false;
+        m_hasAttacked = false;
         // reset to default visual effect
-        ResetVisualEffects();
+        ResetColorEffects();
     }
     /// <summary>
     /// Sets the position of this unit on a 2D grid defined by a map
@@ -240,14 +273,21 @@ public class Unit : MonoBehaviour
         return m_gridPosition;
     }
 
-    public IEnumerator moveTo(Point ai_newPosition) {
-        // deplacement
-        yield return StartMovement(ai_newPosition);
+    /// <summary>
+    /// Consumes one attack of the unit
+    /// </summary>
+    public void ConsumeAttack()
+    {
+        m_hasAttacked = true;
+    }
 
-        m_hasMoved = true;
-
-        // storing position in grid
-        m_gridPosition = ai_newPosition;    
+    /// <summary>
+    /// Tells if unit has consumed all of its attacks
+    /// </summary>
+    /// <returns></returns>
+    public bool HasConsumedAllAttacks()
+    {
+        return m_hasAttacked;
     }
 
     public IEnumerator moveTo(List<Tile> ai_path)
@@ -264,28 +304,34 @@ public class Unit : MonoBehaviour
         m_hasMoved = true;
     }
 
+    /// <summary>
+    /// Tells if unit has consumed at least one action
+    /// </summary>
+    /// <returns></returns>
+    public bool HasConsumedActions()
+    {
+        return m_hasAttacked || m_hasMoved;
+    }
 
     /// <summary>
     /// Indicates if units has moved during this turn
     /// </summary>
     /// <returns>True if played, false otherwise</returns>
-    public bool hasMoved()
+    public bool CanMove()
     {
-        return m_hasMoved;
+        // unit can move if it has not moved and have remaining range
+        // TODO : implement remaining gas
+        return !m_hasMoved;
     }
 
     /// <summary>
-    /// To unselect an unit
+    /// tells if unit can attack
     /// </summary>
-    public void Unselect()
+    /// <returns></returns>
+    public bool CanAttack()
     {
-        // if unit isnt disabled
-        if (!m_disabled)
-        {
-            // reset its visual effects
-            ResetVisualEffects();
-        }
-        // else nothing to do
+        // TODO : implement remaining munition
+        return !m_hasAttacked;
     }
     #endregion
 
@@ -293,7 +339,7 @@ public class Unit : MonoBehaviour
     /// <summary>
     /// Resets all visual effects on the unit
     /// </summary>
-    void ResetVisualEffects()
+    private void ResetColorEffects()
     {
         ChangeSpritesColor(UnityEngine.Color.white);
     }
@@ -311,9 +357,9 @@ public class Unit : MonoBehaviour
         
         float w_targetPositionX = transform.position.x + (ai_newPosition.X - m_gridPosition.X);
         float w_targetPositionY = transform.position.y + (ai_newPosition.Y - m_gridPosition.Y);
-        
+
         // turn sprite in proper direction
-        SetDirection(transform.position.x < w_targetPositionX);
+        SetDirection(transform.position.x, w_targetPositionX);
         
         yield return MoveHorizontally(w_targetPositionX);
         yield return MoveVertically(w_targetPositionY);
@@ -322,16 +368,11 @@ public class Unit : MonoBehaviour
         m_anim.SetBool(UnityAnimationTags.IsWalking, false);
     }
 
-    public void ApplyDisabledColor()
-    {
-        ChangeSpritesColor(DisabledColor);
-    }
-
     private IEnumerator MoveHorizontally(float ai_targetPositionX)
     {
         while (!IsCloseEnoughToTargetPosition(transform.position.x, ai_targetPositionX))
         {
-            transform.position = Vector3.MoveTowards(transform.position, new Vector3(ai_targetPositionX, transform.position.y, -1), MoveSpeed * Time.deltaTime);
+            transform.position = Vector3.MoveTowards(transform.position, new Vector3(ai_targetPositionX, transform.position.y, m_unitZAxis), MoveSpeed * Time.deltaTime);
             yield return null;
         }
     }
@@ -340,14 +381,17 @@ public class Unit : MonoBehaviour
     {
         while (!IsCloseEnoughToTargetPosition(transform.position.y, ai_targetPositionY))
         {
-            transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, ai_targetPositionY, -1), MoveSpeed * Time.deltaTime);
+            transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, ai_targetPositionY, m_unitZAxis), MoveSpeed * Time.deltaTime);
             yield return null;
         }
     }
 
-    private void SetDirection(bool ai_shouldTurnRight)
+    private void SetDirection(float ai_positionX, float ai_targetPositionX)
     {
-        transform.eulerAngles = ai_shouldTurnRight ? new Vector3(0, 180, 0) : new Vector3(0, 0, 0);
+        if(ai_positionX != ai_targetPositionX)
+        {
+            transform.eulerAngles = ai_positionX < ai_targetPositionX ? new Vector3(0, 180, 0) : new Vector3(0, 0, 0);
+        }        
     }
 
     private bool IsCloseEnoughToTargetPosition(float ai_position, float ai_targetPosition)
@@ -358,6 +402,11 @@ public class Unit : MonoBehaviour
     private void ApplyPlayerColor(UnityEngine.Color unitColors)
     {
         Array.ForEach(m_coloredOutfitRenderers, sprite => sprite.color = unitColors);
+    }
+
+    private void ApplyDisabledColor()
+    {
+        ChangeSpritesColor(DisabledColor);
     }
     #endregion
 }

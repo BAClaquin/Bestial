@@ -1,4 +1,6 @@
-﻿using System;
+﻿using GameStateMachine;
+using StateMachine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,9 +8,37 @@ using UnityEngine.UI;
 
 
 /// <summary>
+/// Interfaces provided for game information and action request
+/// </summary>
+public interface IGame
+{
+    /// <summary>
+    /// Is unit playable by current player
+    /// Has remainning possible actions
+    /// Is not disabled
+    /// </summary>
+    /// <param name="ai_unit"></param>
+    /// <returns></returns>
+    bool UnitIsPlayable(Unit ai_unit);
+    bool UnitCanMoveToTile(Unit ai_unit, Tile ai_tile);
+    bool UnitIsAttackableByUnit(Unit ai_unit, Unit ai_target);
+    void HighlightAccessibleTiles(Unit ai_unit);
+    void DisplayAvailableTargets(Unit ai_unit);
+    void UnlightAllActions();
+    void moveUnitToTile(Unit ai_unit, Tile ai_tile);
+    void AttackEnnemi(Unit ai_unit, Unit ai_target);
+    /// <summary>
+    /// Tells if unit belongs to current player
+    /// </summary>
+    /// <param name="unit">Unit</param>
+    /// <returns>True if belongs, false otherwise</returns>
+    bool UnitBelongsToCurrentPlayer(Unit unit);
+}
+
+/// <summary>
 /// Global Game Manager where you can manage Games
 /// </summary>
-public class Game : MonoBehaviour
+public class Game : MonoBehaviour,IGame
 {
     #region Public Unity Members
     [Header(UnityHeaders.Gameplay)]
@@ -27,7 +57,7 @@ public class Game : MonoBehaviour
 
     #endregion
 
-    #region Private Memebrs
+    #region Private Members
     Unit m_selectedUnit;
     bool m_actionAfterMoveMode = false;
     List<Unit> m_targetableUnits;
@@ -35,6 +65,7 @@ public class Game : MonoBehaviour
 
     private int CurrentPlayerTurn = -1;
     private bool GameIsOver = false;
+    private IStateMachine<GameEventSytstem> m_stateMachine;
 
     #region UI Functions
     void Start()
@@ -52,15 +83,22 @@ public class Game : MonoBehaviour
             throw new System.NullReferenceException("CurrentMap is null");
         }
 
+        Factory factory = new Factory(this);
+        m_stateMachine = factory.Create("my state machine");
+        m_stateMachine.Start();
+
         NextTurn();
-        Tracer.Instance.Trace(TraceLevel.INFO, "Game started !");
+        Tracer.Instance.Trace(TraceLevel.INFO1, "Game started !");
 
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        if(m_stateMachine != null)
+        {
+            m_stateMachine.ComputeState();
+        }
     }
     #endregion
 
@@ -82,6 +120,21 @@ public class Game : MonoBehaviour
         }
     }
 
+    public bool UnitIsPlayable(Unit ai_unit)
+    {
+        // dumb implem to refactor with msart action management system
+        if ( ai_unit.IsDisabled() || !UnitBelongsToCurrentPlayer(ai_unit) || ai_unit.HasConsumedAllAttacks())
+        {
+            return false;
+        }
+        if(ai_unit.CanAttack() && CurrentMap.HasAvailableTargets(CurrentPlayer(), ai_unit))
+        {
+            return true;
+        }
+        return ai_unit.CanMove();
+    }
+
+
     private void SetNextPlayer()
     {
         CurrentPlayerTurn = (CurrentPlayerTurn + 1) % Players.Length;
@@ -95,77 +148,28 @@ public class Game : MonoBehaviour
     /// <param name="ai_unit"></param>
     public void onSelectedUnit(Unit ai_unit)
     {
-
-        //bool doubleClick = m_selectedUnit != null && m_selectedUnit == ai_unit && unitBelongToCurrentPlayer(ai_unit);
-        //bool clickOnTargetableUnit = m_selectedUnit != null  && m_targetableUnits.Contains(ai_unit);
-
-        if (m_selectedUnit != null && m_targetableUnits != null && m_targetableUnits.Contains(ai_unit) && !unitBelongToCurrentPlayer(ai_unit))
-        {
-            attackEnnemi(ai_unit);
-        }
-        else if (m_selectedUnit != null)
-        {
-            if (m_actionAfterMoveMode)
-            {
-                restUnit();
-                selectUnit(ai_unit);
-            }
-            else
-            {
-                if (m_selectedUnit == ai_unit)
-                {
-                    restUnit();
-                }
-                else
-                {
-                    selectUnit(ai_unit);
-                }
-            }
-        }
-        else
-        {
-            selectUnit(ai_unit);
-        }
-
-
-
-        /*
-        if (doubleClick) // clicked twice on the same unit (and unit belongs to current player) => restUnit
-        {
-            restUnit();
-        }
-        else if (clickOnTargetableUnit) 
-        {
-            attackEnnemi(ai_unit);
-        }
-        else // select ai_unit
-        {
-            selectUnit(ai_unit);
-        }*/
+        m_stateMachine.GetEventSystem().RaiseUnitSelectedEvent(ai_unit);       
     }
 
-    private void selectUnit(Unit ai_unit)
+    public void HighlightAccessibleTiles(Unit ai_unit)
     {
-        print("select ai_unit");
-        resetCurrentAction();
-
-        // if unit hasn't played
-        if (!ai_unit.hasMoved() && unitBelongToCurrentPlayer(ai_unit))
+        if (UnitIsPlayable(ai_unit))
         {
-            m_selectedUnit = ai_unit;
-            ai_unit.Highlight();
             CurrentMap.DisplayAvailableMoves(ai_unit);
-            m_targetableUnits = CurrentMap.DisplayAvailableTargets(CurrentPlayer(), ai_unit);
         }
     }
 
-    private void attackEnnemi(Unit ai_unit)
+    public void DisplayAvailableTargets(Unit ai_unit)
     {
-        CurrentMap.removeUnit(ai_unit);
-        ai_unit.Kill(); // kill targeted unit
-        m_selectedUnit.Disable();
-        resetCurrentAction();
+        m_targetableUnits = CurrentMap.DisplayAvailableTargets(CurrentPlayer(), ai_unit);
     }
+
+
+    public void UnlightAllActions()
+    {
+        CurrentMap.ResetAvailableMoves();
+    }
+
 
     /// <summary>
     /// Occurs when a tile is selected
@@ -173,56 +177,23 @@ public class Game : MonoBehaviour
     /// <param name="ai_tile"></param>
     public void onSelectedTile(Tile ai_tile)
     {
-        if (m_selectedUnit != null)
-        {
-            print("unit slected");
-            if (m_actionAfterMoveMode) // unit already selected + attackAfterMove + click on some tile => unit rests
-            {
-                restUnit();               
-            }
-            else // unit selected + unit not moved + click on some tiles => unit moves
-            {
-                bool unitCanMoveToTile = ai_tile.isTaggedAccessible() && !m_selectedUnit.hasMoved() && unitBelongToCurrentPlayer(m_selectedUnit);
-                if (unitCanMoveToTile)
-                {
-                    StartCoroutine(moveUnit(ai_tile));
-                }
-            }
-        }
+        m_stateMachine.GetEventSystem().RaiseTileSelctedEvent(ai_tile);
     }
 
-    private void restUnit()
+
+    public void moveUnitToTile(Unit m_selectedUnit, Tile ai_tile)
+    {        
+        StartCoroutine(moveTo(m_selectedUnit, ai_tile));
+       
+    }
+
+    private IEnumerator moveTo(Unit m_selectedUnit, Tile ai_tile)
     {
-        m_actionAfterMoveMode = false;
-        m_selectedUnit.Disable();
-        resetCurrentAction();
+        yield return m_selectedUnit.moveTo(CurrentMap.getComputedPathTo(ai_tile));
+        m_stateMachine.GetEventSystem().RaiseMoveOverEvent();
     }
 
-    private IEnumerator moveUnit(Tile ai_tile)
-    {
-        CurrentMap.ResetAvailableMoves();
-        //yield return m_selectedUnit.moveTo(ai_tile.getGridPosition());
-        yield return  m_selectedUnit.moveTo(CurrentMap.getComputedPathTo(ai_tile));
-        // setup actions such as attacking or resting
-        actionsAfterMove(ai_tile);
-    }
-
-    private void actionsAfterMove(Tile ai_tile)
-    {
-        m_targetableUnits = CurrentMap.DisplayAvailableTargets(CurrentPlayer(), m_selectedUnit);
-        bool w_thereAreTargetableEnnemyUnits = m_targetableUnits.Count != 0;
-        if (w_thereAreTargetableEnnemyUnits) // if unit can attack, user must chose betweek attack or rest
-        {
-            m_actionAfterMoveMode = true;
-        }
-        else // otherwise the unit rests
-        {
-            m_selectedUnit.Disable();
-            resetCurrentAction();
-        }
-    }
-
-    private bool unitBelongToCurrentPlayer(Unit m_selectedUnit)
+    public bool UnitBelongsToCurrentPlayer(Unit m_selectedUnit)
     {
         return CurrentPlayer().HasUnit(m_selectedUnit);
     }
@@ -244,13 +215,31 @@ public class Game : MonoBehaviour
         if (m_selectedUnit != null)
         {
             // reset availability of an nit
-            m_selectedUnit.Unselect();
+            m_selectedUnit.SetSelected(false);
             // reset highlighted tiles
             CurrentMap.ResetAvailableMoves();
             // no unit is being selected
             m_selectedUnit = null;
         }
         // else no actions to reset for the moment
+    }
+
+    public bool UnitCanMoveToTile(Unit ai_unit, Tile ai_tile)
+    {
+        return ai_tile.isTaggedAccessible() && ai_unit.CanMove() && UnitBelongsToCurrentPlayer(ai_unit);
+    }
+
+    public bool UnitIsAttackableByUnit(Unit ai_unit, Unit ai_target)
+    {
+        return m_targetableUnits.Contains(ai_target);
+    }
+
+    public void AttackEnnemi(Unit ai_unit, Unit ai_targetUnit)
+    {
+        // TODO: actually use ai_unit
+        CurrentMap.removeUnit(ai_targetUnit);
+        ai_targetUnit.Kill(); // kill targeted unit
+        ai_unit.ConsumeAttack(); // unit has consumed its attack
     }
     #endregion
 

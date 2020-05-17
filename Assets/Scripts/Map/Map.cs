@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Drawing;
 using System;
 using System.Linq;
+using System.Diagnostics;
 
 public interface IPathFindingMap
 {
@@ -90,6 +91,7 @@ public class Map : MonoBehaviour, IPathFindingMap
 
     public List<Unit> DisplayAvailableTargets(Player ai_currentPlayer, Unit ai_unit)
     {
+        Tracer.Instance.Trace(TraceLevel.DEBUG, "Refactor this method");
         List<Point> attackablePoints = getPositionsWithin(new Point(ai_unit.getGridPosition().X, ai_unit.getGridPosition().Y), 1);
         List<Unit> attackableUnits = new List<Unit>();
         List<Tile> attackableTiles = attackablePoints
@@ -106,6 +108,26 @@ public class Map : MonoBehaviour, IPathFindingMap
             .ToList();
         SetTilesAsAttackable(attackableTiles);        
         return attackableUnits;
+    }
+
+    public bool HasAvailableTargets(Player ai_currentPlayer, Unit ai_unit)
+    {
+        Tracer.Instance.Trace(TraceLevel.DEBUG, "Refactor this method");
+        List<Point> attackablePoints = getPositionsWithin(new Point(ai_unit.getGridPosition().X, ai_unit.getGridPosition().Y), 1);
+        List<Unit> attackableUnits = new List<Unit>();
+        List<Tile> attackableTiles = attackablePoints
+            .FindAll(point => { // find all attackable tiles where there are ennemy units
+                Unit w_unitOnCase = m_listOfUnits.FirstOrDefault(unit => unit.getGridPosition() == point && !unit.GetPlayer().Equals(ai_currentPlayer)); // ennemy unit on point
+                if (w_unitOnCase != null)
+                {
+                    attackableUnits.Add(w_unitOnCase);
+                    return true;
+                }
+                return false;
+            })
+            .Select(point => m_tileMap[point.X, point.Y]) // get tile from point
+            .ToList();
+        return attackableUnits.Count() != 0 ;
     }
 
     private void SetTilesAsAttackable(List<Tile> attackableTiles)
