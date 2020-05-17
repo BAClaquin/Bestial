@@ -8,6 +8,7 @@ using System.Diagnostics;
 /// </summary>
 public enum TraceLevel
 {
+    TEMPORARY, // when you want to display a temporary test message
     ERROR, // When something wrong should not happen
     WARNING, // when something is dangerous but game can continue
     INFO1, // 1st level of information (High Level Info)

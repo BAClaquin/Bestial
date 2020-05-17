@@ -18,13 +18,6 @@ namespace StateMachine
         where TStateEnum : System.Enum
         where TStateMachineWorker : IStateMachineWorker
     {
-        #region Condition for transition
-        /// <summary>
-        /// Externally provided condition to test if transition is possible
-        /// </summary>
-        EvaluateConditionDelegate<TStateEnum, TStateMachineWorker, TEventSystem> m_conditionDelegate;
-        #endregion
-
         #region Members
         /// <summary>
         /// State to transit from
@@ -38,17 +31,17 @@ namespace StateMachine
 
         #region Private Members
         IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventSystem> m_internalStateMachine;
-        OnTransitionDelegate<TStateEnum, TStateMachineWorker, TEventSystem> m_onTransitionDelegate;
+        TransitionBehaviour<TStateEnum, TStateMachineWorker, TEventSystem> m_transitionBehaviour;
         #endregion
 
         #region Constructors
         public Transition(TStateEnum ai_from, TStateEnum ai_to,
-            EvaluateConditionDelegate<TStateEnum, TStateMachineWorker, TEventSystem> ai_conditionFunction,
+            TransitionBehaviour<TStateEnum, TStateMachineWorker, TEventSystem> ai_transitionBehaviour,
             IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventSystem> ai_stateMachine)
         {
             From = ai_from;
             To = ai_to;
-            m_conditionDelegate = ai_conditionFunction;
+            m_transitionBehaviour = ai_transitionBehaviour;
             m_internalStateMachine = ai_stateMachine;
         }
         #endregion
@@ -73,47 +66,15 @@ namespace StateMachine
             return "{Transition from " + From.ToString() + " to " + To.ToString() + "}";
         }
 
-        /// <summary>
-        /// Evaluates if the transition is possible
-        /// </summary>
-        /// <returns>True if transition possible, false otherwise</returns>
-        public bool evaluateCondition()
-        {
-            // check if current state matching start state
-            if (!m_internalStateMachine.GetCurrentState().ID.Equals(From))
-            {
-                // should not happen if stateMachine correctly implemented
-                Tracer.Instance.Trace(TraceLevel.ERROR, "Evaluating transition from state " + m_internalStateMachine.GetCurrentState().ToString()
-                       + "but this transition starts from state " + From.ToString());
-                return false;
-            }
 
-            // preconditions ok, test if transition is allowed
-            return m_conditionDelegate(m_internalStateMachine);
+        public bool EvaluateCondition()
+        {
+            return m_transitionBehaviour.EvaluateCondition();
         }
 
-
-        /// <summary>
-        ///  Adds a function that will be called when transiting
-        /// </summary>
-        /// <param name="ai_delegate">function to call</param>
-        public void SetTransitionAction(OnTransitionDelegate<TStateEnum, TStateMachineWorker, TEventSystem> ai_delegate)
+        public void ExecuteTransition()
         {
-            if (m_onTransitionDelegate != null)
-            {
-                Tracer.Instance.Trace(TraceLevel.WARNING, "On transition delegate function has already been set. It will be replaced by this new one.");
-            }
-
-            m_onTransitionDelegate = ai_delegate;
-        }
-
-        /// <summary>
-        /// If a tranistion action is set : calls it
-        /// </summary>
-        public void CallTransitionAction()
-        {
-            // if a trasition action is defined call it
-            m_onTransitionDelegate?.Invoke(m_internalStateMachine);
+            m_transitionBehaviour.ExecuteTransition();
         }
         #endregion
     }

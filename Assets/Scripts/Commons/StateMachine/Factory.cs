@@ -10,7 +10,7 @@ namespace StateMachine
         where TEventSystem : new()
     {
         #region Private Members
-        StateMachine<TStateEnum, TStateMachineWorker, TEventSystem> m_stateMachine;
+        protected StateMachine<TStateEnum, TStateMachineWorker, TEventSystem> m_stateMachine;
         Configuration<TStateEnum, TStateMachineWorker, TEventSystem> m_config;
         TStateMachineWorker m_worker;
         IGame m_game;
@@ -40,16 +40,6 @@ namespace StateMachine
             // return created state machine
             return m_stateMachine;
         }
-        /// <summary>
-        /// Creates and adds a new state to the configuration 
-        /// </summary>
-        /// <param name="ai_stateEnumID">Id for the state</param>
-        /// <param name="ai_isStartState">is this state the start state</param>
-        /// <returns>the added state</returns>
-        //protected State<TStateEnum, TStateMachineWorker, TEventSystem> AddNewState(TStateEnum ai_stateEnumID, bool ai_isStartState = false)
-        //{
-        //    return m_config.addState(new State<TStateEnum, TStateMachineWorker, TEventSystem>(ai_stateEnumID, m_stateMachine), ai_isStartState);
-        //}
 
         protected void AddNewState(State<TStateEnum, TStateMachineWorker, TEventSystem> ai_state, bool ai_isStartState = false)
         {
@@ -62,11 +52,11 @@ namespace StateMachine
         /// </summary>
         /// <param name="ai_from">State ID from</param>
         /// <param name="ai_to">State ID to</param>
-        /// <param name="ai_conditionFunction">Condition function for transiting</param>
+        /// <param name="ai_transitionBehaviour">Condition function for transiting</param>
         /// <returns>the added transition</returns>
-        protected Transition<TStateEnum, TStateMachineWorker, TEventSystem> AddNewTransition(TStateEnum ai_from, TStateEnum ai_to, EvaluateConditionDelegate<TStateEnum, TStateMachineWorker, TEventSystem> ai_conditionFunction)
+        protected Transition<TStateEnum, TStateMachineWorker, TEventSystem> AddNewTransition(TStateEnum ai_from, TStateEnum ai_to, TransitionBehaviour<TStateEnum, TStateMachineWorker, TEventSystem> ai_transitionBehaviour)
         {
-            return m_config.addTransition(new Transition<TStateEnum, TStateMachineWorker, TEventSystem>(ai_from, ai_to, ai_conditionFunction, m_stateMachine));
+            return m_config.addTransition(new Transition<TStateEnum, TStateMachineWorker, TEventSystem>(ai_from, ai_to, ai_transitionBehaviour, m_stateMachine));
         }
         #endregion
 

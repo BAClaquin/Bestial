@@ -9,13 +9,10 @@ namespace GameStateMachine
     public enum GameStates
     {
         WAIT_GAME_ACTION,
-        WAIT_UNIT_ACTION_IDLE,
-        WAIT_UNIT_ACTION_TILE_SELECTED,
-        WAIT_UNIT_ACTION_UNIT_SELECTED,
+        WAIT_UNIT_ACTION,
         UNIT_SELECTED,       
         MOVE_UNIT,
         ATTACK,
-        NEXT_TURN,
-        WAIT_UNIT_ACTION
+        NEXT_TURN
     }
 }

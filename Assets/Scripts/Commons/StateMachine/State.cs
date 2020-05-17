@@ -46,7 +46,7 @@ namespace StateMachine
 
         #region Public 
 
-        public void setStateMachine(IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventSystem> ai_stateMachine)
+        public void SetStateMachine(IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventSystem> ai_stateMachine)
         {
             m_internalStateMachine = ai_stateMachine;
         }
@@ -75,8 +75,8 @@ namespace StateMachine
         /// </summary>
         public void OnEnter()
         {
-            Tracer.Instance.Trace(TraceLevel.INFO2, "Entering state" + ToString());
-            _onEnterImpl();
+            Tracer.Instance.Trace(TraceLevel.INFO2, "Entering state  : " + ToString());
+            OnEnterImpl();
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace StateMachine
         public void OnState()
         {
             Tracer.Instance.Trace(TraceLevel.DEBUG, "On state" + ToString());
-            _onStateImpl();
+            OnStateImpl();
         }
 
 
@@ -94,8 +94,8 @@ namespace StateMachine
         /// </summary>
         public void OnLeave()
         {
-            Tracer.Instance.Trace(TraceLevel.INFO2, "Leaving state " + ToString());
-            _onLeaveImpl();
+            Tracer.Instance.Trace(TraceLevel.INFO2, "Leaving state : " + ToString());
+            OnLeaveImpl();
         }
 
 
@@ -113,15 +113,15 @@ namespace StateMachine
         /// <summary>
         ///  State specific on state impl if required
         /// </summary>
-        protected virtual void _onStateImpl() { }
+        protected virtual void OnStateImpl() { }
         /// <summary>
         ///  State specific on enter impl if required
         /// </summary>
-        protected virtual void _onEnterImpl() { }
+        protected virtual void OnEnterImpl() { }
         /// <summary>
         ///  State specific on leave impl if required
         /// </summary>
-        protected virtual void _onLeaveImpl() { }
+        protected virtual void OnLeaveImpl() { }
         #endregion
     }
 }

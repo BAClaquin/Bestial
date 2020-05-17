@@ -148,16 +148,18 @@ namespace StateMachine
         /// </summary>
         public void Start()
         {
+            Tracer.Instance.Trace(TraceLevel.INFO1, "{"  + m_configuration.StateMachineName + "}" + " : STARTING...");
+            m_worker.reset();
             // preconditions
             if (!m_configuration.checkConfiguration())
             {
-                Tracer.Instance.Trace(TraceLevel.ERROR, "State Machine configuration is incorrect : won't start");
+                Tracer.Instance.Trace(TraceLevel.ERROR, "State machine configuration is incorrect : won't start");
                 return;
             }
+            SetCurrentState(m_configuration.getStartState());
             // start state machine
             m_isStarted = true;
-            SetCurrentState(m_configuration.getStartState());
-            m_worker.reset();
+            Tracer.Instance.Trace(TraceLevel.INFO1, "{"  + m_configuration.StateMachineName + "} : STARTED !");
         }
 
         /// <summary>
@@ -184,7 +186,11 @@ namespace StateMachine
             // see if one transition is possible
             Transition<TStateEnum, TStateMachineWorker, TEventSystem> w_transitionToExecute = LookForPossibleTransition(m_eligibleTransitions);
             // if not : end for this computeState
-            if (w_transitionToExecute == null) { return; }
+            if (w_transitionToExecute == null)
+            {
+                // TOOD : consommer les events s'il n'ont pas été pris ?
+                return;
+            }
 
             // we found a transition execute it
             ExecuteTransition(w_transitionToExecute);
@@ -205,7 +211,7 @@ namespace StateMachine
             // update eleigible transitions
             m_eligibleTransitions = m_configuration.getAllTransitionsFrom(m_currentState);
 
-            Tracer.Instance.Trace(TraceLevel.INFO1, "{" + m_configuration.StateMachineName + "} Current state is " + m_currentState.ToString());
+            Tracer.Instance.Trace(TraceLevel.INFO1, "{" + m_configuration.StateMachineName + "} state is " + m_currentState.ToString());
         }
 
         /// <summary>
@@ -217,7 +223,7 @@ namespace StateMachine
         {
             foreach (var transition in ai_eligibleTransitions)
             {
-                if (transition.evaluateCondition())
+                if (transition.EvaluateCondition())
                 {
                     return transition;
                 }
@@ -245,7 +251,7 @@ namespace StateMachine
             // execute state leave
             m_configuration.getStateByID(ai_transition.From).OnLeave();
             // execute transition action
-            ai_transition.CallTransitionAction();
+            ai_transition.ExecuteTransition();
             // set the new reached state
             SetCurrentState(m_configuration.getStateByID(ai_transition.To));
         }

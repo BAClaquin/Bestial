@@ -18,15 +18,9 @@ namespace GameStateMachine
     {
         public MoveUnit() : base(GameStates.MOVE_UNIT) { }
 
-        public static bool toUnitSelected(IInternalStateMachine ai_internalStateMachine)
+        override protected void OnEnterImpl()
         {
-            // quit state when moving animation is over
-            return Utils.eventOccured(ai_internalStateMachine, EventEnum.ANIMATION_IS_OVER);
-        }
-
-        override protected void _onEnterImpl()
-        {
-            m_internalStateMachine.GetGame().moveUnitToTile(m_internalStateMachine.GetWorker().m_currentUnit, m_internalStateMachine.GetWorker().m_targetTile);
+            m_internalStateMachine.GetGame().moveUnitToTile(m_internalStateMachine.GetWorker().CurrentUnit, m_internalStateMachine.GetWorker().LastSelectedTile);
         }
 
     }

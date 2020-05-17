@@ -10,6 +10,6 @@ namespace GameStateMachine
     {
         TILE_SELECTED,
         UNIT_SELECTED,
-        ANIMATION_IS_OVER,
+        MOVE_IS_OVER,
     }
 }

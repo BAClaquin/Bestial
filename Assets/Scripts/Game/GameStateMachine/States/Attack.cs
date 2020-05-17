@@ -13,13 +13,8 @@ namespace GameStateMachine
     {
         public Attack() : base(GameStates.ATTACK) { }
 
-        public static bool toUnitSelected(IInternalStateMachine ai_internalStateMachine)
-        {
-            return true;
-        }
-
         override
-        protected void _onEnterImpl()
+        protected void OnEnterImpl()
         {
             Utils.attackUnit(m_internalStateMachine);
         }
