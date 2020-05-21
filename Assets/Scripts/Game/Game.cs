@@ -25,7 +25,7 @@ public interface IGame
     void HighlightAccessibleTiles(Unit ai_unit);
     void DisplayAvailableTargets(Unit ai_unit);
     void UnlightAllActions();
-    void moveUnitToTile(Unit ai_unit, Tile ai_tile);
+    void MoveUnitToTile(Unit ai_unit, Tile ai_tile);
     void AttackEnnemi(Unit ai_unit, Unit ai_target);
     /// <summary>
     /// Tells if unit belongs to current player
@@ -62,8 +62,6 @@ public class Game : MonoBehaviour,IGame
     #endregion
 
     #region Private Members
-    Unit m_selectedUnit;
-    bool m_actionAfterMoveMode = false;
     List<Unit> m_targetableUnits;
     #endregion
 
@@ -158,7 +156,7 @@ public class Game : MonoBehaviour,IGame
     /// Occurs when an unit is selected
     /// </summary>
     /// <param name="ai_unit"></param>
-    public void onSelectedUnit(Unit ai_unit)
+    public void OnSelectedUnit(Unit ai_unit)
     {
         m_stateMachine.GetEventEmiter().GetUnitSelectedEmitter().Raise(ai_unit);
     }
@@ -187,21 +185,20 @@ public class Game : MonoBehaviour,IGame
     /// Occurs when a tile is selected
     /// </summary>
     /// <param name="ai_tile"></param>
-    public void onSelectedTile(Tile ai_tile)
+    public void OnSelectedTile(Tile ai_tile)
     {
         m_stateMachine.GetEventEmiter().GetTileSelectedEmitter().Raise(ai_tile);
     }
 
 
-    public void moveUnitToTile(Unit m_selectedUnit, Tile ai_tile)
+    public void MoveUnitToTile(Unit m_selectedUnit, Tile ai_tile)
     {        
-        StartCoroutine(moveTo(m_selectedUnit, ai_tile));
-       
+        StartCoroutine(MoveTo(m_selectedUnit, ai_tile));       
     }
 
-    private IEnumerator moveTo(Unit m_selectedUnit, Tile ai_tile)
+    private IEnumerator MoveTo(Unit m_selectedUnit, Tile ai_tile)
     {
-        yield return m_selectedUnit.moveTo(CurrentMap.getComputedPathTo(ai_tile));
+        yield return m_selectedUnit.MoveTo(CurrentMap.getComputedPathTo(ai_tile));
         m_stateMachine.GetEventEmiter().GetMoveIsOverEmitter().Raise();
     }
 
@@ -218,9 +215,11 @@ public class Game : MonoBehaviour,IGame
     #endregion
 
     #region Private Functions
+
+
     public bool UnitCanMoveToTile(Unit ai_unit, Tile ai_tile)
     {
-        return ai_tile.isTaggedAccessible() && ai_unit.CanMove() && UnitBelongsToCurrentPlayer(ai_unit);
+        return ai_tile.IsTaggedAccessible() && ai_unit.CanMove() && UnitBelongsToCurrentPlayer(ai_unit);
     }
 
     public bool UnitIsAttackableByUnit(Unit ai_unit, Unit ai_target)

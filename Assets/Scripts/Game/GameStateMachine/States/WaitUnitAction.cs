@@ -19,11 +19,13 @@ namespace GameStateMachine
         override protected void OnEnterImpl()
         {
             // displays possible actions for current unit
+            m_internalStateMachine.GetWorker().HighlightCurrentUnit(true);
             Utils.DisplayPossibleActions(m_internalStateMachine, m_internalStateMachine.GetWorker().CurrentUnit);
         }
 
         override protected void OnLeaveImpl()
         {
+            m_internalStateMachine.GetWorker().HighlightCurrentUnit(false);
             m_internalStateMachine.GetWorker().DeselectCurrentUnit();
             Utils.undisplayPossibleAction(m_internalStateMachine);
         }

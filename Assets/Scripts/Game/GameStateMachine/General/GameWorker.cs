@@ -30,6 +30,10 @@ namespace GameStateMachine
             CurrentUnit.SetSelected(false);
         }
 
+        public void HighlightCurrentUnit(bool ai_highlight)
+        {
+            CurrentUnit.Highlight(ai_highlight);
+        }
 
         public void reset()
         {

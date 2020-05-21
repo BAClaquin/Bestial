@@ -9,8 +9,8 @@ using System.Diagnostics;
 public interface IPathFindingMap
 {
     bool IsPositionFree(Point ai_position);
-    Point getSize();
-    Tile[,] getGrid();
+    Point GetSize();
+    Tile[,] GetGrid();
 }
 
 public class Map : MonoBehaviour, IPathFindingMap
@@ -92,11 +92,11 @@ public class Map : MonoBehaviour, IPathFindingMap
     public List<Unit> DisplayAvailableTargets(Player ai_currentPlayer, Unit ai_unit)
     {
         Tracer.Instance.Trace(TraceLevel.DEBUG, "Refactor this method");
-        List<Point> attackablePoints = getPositionsWithin(new Point(ai_unit.getGridPosition().X, ai_unit.getGridPosition().Y), 1);
+        List<Point> attackablePoints = getPositionsWithin(new Point(ai_unit.GetGridPosition().X, ai_unit.GetGridPosition().Y), 1);
         List<Unit> attackableUnits = new List<Unit>();
         List<Tile> attackableTiles = attackablePoints
             .FindAll(point => { // find all attackable tiles where there are ennemy units
-                Unit w_unitOnCase = m_listOfUnits.FirstOrDefault(unit => unit.getGridPosition() == point && !unit.GetPlayer().Equals(ai_currentPlayer)); // ennemy unit on point
+                Unit w_unitOnCase = m_listOfUnits.FirstOrDefault(unit => unit.GetGridPosition() == point && !unit.Player.Equals(ai_currentPlayer)); // ennemy unit on point
                 if(w_unitOnCase != null)
                 {
                     attackableUnits.Add(w_unitOnCase);
@@ -113,11 +113,11 @@ public class Map : MonoBehaviour, IPathFindingMap
     public bool HasAvailableTargets(Player ai_currentPlayer, Unit ai_unit)
     {
         Tracer.Instance.Trace(TraceLevel.DEBUG, "Refactor this method");
-        List<Point> attackablePoints = getPositionsWithin(new Point(ai_unit.getGridPosition().X, ai_unit.getGridPosition().Y), 1);
+        List<Point> attackablePoints = getPositionsWithin(new Point(ai_unit.GetGridPosition().X, ai_unit.GetGridPosition().Y), 1);
         List<Unit> attackableUnits = new List<Unit>();
         List<Tile> attackableTiles = attackablePoints
             .FindAll(point => { // find all attackable tiles where there are ennemy units
-                Unit w_unitOnCase = m_listOfUnits.FirstOrDefault(unit => unit.getGridPosition() == point && !unit.GetPlayer().Equals(ai_currentPlayer)); // ennemy unit on point
+                Unit w_unitOnCase = m_listOfUnits.FirstOrDefault(unit => unit.GetGridPosition() == point && !unit.Player.Equals(ai_currentPlayer)); // ennemy unit on point
                 if (w_unitOnCase != null)
                 {
                     attackableUnits.Add(w_unitOnCase);
@@ -169,7 +169,7 @@ public class Map : MonoBehaviour, IPathFindingMap
         foreach (Unit w_unit in m_listOfUnits)
         {
             // if an unit is found at this position : position is not free
-            if (w_unit.getGridPosition() == ai_gridIndex)
+            if (w_unit.GetGridPosition() == ai_gridIndex)
             {
                 return false;
             }
@@ -187,7 +187,7 @@ public class Map : MonoBehaviour, IPathFindingMap
     /// Provides the size of the map
     /// </summary>
     /// <returns>Size of the map</returns>
-    public Point getSize()
+    public Point GetSize()
     {
         return m_size;
     }
@@ -196,7 +196,7 @@ public class Map : MonoBehaviour, IPathFindingMap
     /// Provides the grid map
     /// </summary>
     /// <returns>grid map</returns>
-    public Tile[,] getGrid()
+    public Tile[,] GetGrid()
     {
         return m_tileMap;
     }
@@ -253,18 +253,18 @@ public class Map : MonoBehaviour, IPathFindingMap
             foreach (Tile w_tile in ai_fromTiles)
             {
                 // look for neighbours (with range of 1)
-                List<Point> w_neighbours = getPositionsWithin(w_tile.getGridPosition(), 1);
+                List<Point> w_neighbours = getPositionsWithin(w_tile.GetGridPosition(), 1);
                 // for each of these new neighbours
                 foreach (Point w_neighbourPoint in w_neighbours)
                 {
                     Tile w_currentTile = m_tileMap[w_neighbourPoint.X, w_neighbourPoint.Y];
                     // if the tile has not already been tagged as accessible
                     // checked in separate if to avoid multiple computations)
-                    if (! w_currentTile.isTaggedAccessible())
+                    if (! w_currentTile.IsTaggedAccessible())
                     {
                         // if the tile is accessible for the provided type of unit
                         // and the tile if free
-                        if (w_currentTile.isAccessibleForUnitType(ai_unit) && IsPositionFree(w_currentTile.getGridPosition()))
+                        if (w_currentTile.IsAccessibleForUnitType(ai_unit) && IsPositionFree(w_currentTile.GetGridPosition()))
                         {
                             // we have a new accessible tile to add
                             w_newAccessibleTiles.Add(w_currentTile);
@@ -298,10 +298,10 @@ public class Map : MonoBehaviour, IPathFindingMap
         Tile[] w_tiles = FindObjectsOfType<Tile>();
 
         // compute caracteristics for map copsed of provided tiles
-        initGridCaracteristics(w_tiles);
+        InitGridCaracteristics(w_tiles);
 
         // fill the grid with each tiles based on previously computed caracteristics
-        return fillCaracterizedGrid(w_tiles);
+        return FillCaracterizedGrid(w_tiles);
     }
 
     /// <summary>
@@ -320,7 +320,7 @@ public class Map : MonoBehaviour, IPathFindingMap
             // adding unit to list
             m_listOfUnits.Add(w_unit);
             // setting unit position on the grid
-            w_unit.setGridPosition( convertToGridPosition(w_unit.transform.position) );
+            w_unit.SetGridPosition( convertToGridPosition(w_unit.transform.position) );
         }
 
         return w_correctlyInitialized;
@@ -420,7 +420,7 @@ public class Map : MonoBehaviour, IPathFindingMap
     ///  - TileMap object
     /// and store ioit in members
     /// </summary>
-    void initGridCaracteristics(Tile[] ai_tiles)
+    void InitGridCaracteristics(Tile[] ai_tiles)
     {
         // preconditions
        if(ai_tiles.Length <= 0)
@@ -465,7 +465,7 @@ public class Map : MonoBehaviour, IPathFindingMap
     /// </summary>
     /// <param name="ai_tiles">Tiles composing the map</param>
     /// <returns>True if grid is correctly filled, false otherwise</returns>
-    bool fillCaracterizedGrid(Tile[] ai_tiles)
+    bool FillCaracterizedGrid(Tile[] ai_tiles)
     {
         // Browse each tile to place them in our 2D Map
         Point w_index;
@@ -484,7 +484,7 @@ public class Map : MonoBehaviour, IPathFindingMap
             {
                 m_tileMap[w_index.X, w_index.Y] = w_tile;
                 // store the position inside the tile
-                w_tile.setGridPosition(new Point(w_index.X, w_index.Y));
+                w_tile.SetGridPosition(new Point(w_index.X, w_index.Y));
             }
         }
 

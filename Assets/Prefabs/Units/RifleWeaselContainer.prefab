@@ -67,8 +67,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -425312291
+  m_SortingLayer: -2
   m_SortingOrder: 6
   m_Sprite: {fileID: -4222279546176556164, guid: 9edc38138daced047853401a1b33b915,
     type: 3}
@@ -274,8 +274,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -425312291
+  m_SortingLayer: -2
   m_SortingOrder: 0
   m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -297,16 +297,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 8089554524920735593}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 13bed2d7f56dae349b903b5d42550b2b, type: 3}
+  m_Script: {fileID: 11500000, guid: 775f754f4c792da41831d000b1c33415, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   FieldOfOperation: 0
   UnitType: 0
-  MovementRange: 6
-  MoveSpeed: 4
-  HighlightedColor: {r: 1, g: 1, b: 1, a: 1}
-  DisabledColor: {r: 0.5283019, g: 0.5283019, b: 0.5283019, a: 1}
-  m_unitZAxis: -3
+  MovementRange: 5
+  MoveSpeed: 5
+  HighlightedColor: {r: 0.9780209, g: 1, b: 0, a: 1}
+  DisabledColor: {r: 0.6603774, g: 0.6603774, b: 0.6603774, a: 1}
 --- !u!1001 &5695524840379730472
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -314,6 +313,36 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 8089554524920735598}
     m_Modifications:
+    - target: {fileID: 4560263303353584812, guid: 9b94993b6d7d76148802f08de293b03f,
+        type: 3}
+      propertyPath: m_SortingLayerID
+      value: -425312291
+      objectReference: {fileID: 0}
+    - target: {fileID: 4560263303353584812, guid: 9b94993b6d7d76148802f08de293b03f,
+        type: 3}
+      propertyPath: m_SortingLayer
+      value: -2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4560263303426918626, guid: 9b94993b6d7d76148802f08de293b03f,
+        type: 3}
+      propertyPath: m_SortingLayerID
+      value: -425312291
+      objectReference: {fileID: 0}
+    - target: {fileID: 4560263303426918626, guid: 9b94993b6d7d76148802f08de293b03f,
+        type: 3}
+      propertyPath: m_SortingLayer
+      value: -2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4560263303448880622, guid: 9b94993b6d7d76148802f08de293b03f,
+        type: 3}
+      propertyPath: m_SortingLayerID
+      value: -425312291
+      objectReference: {fileID: 0}
+    - target: {fileID: 4560263303448880622, guid: 9b94993b6d7d76148802f08de293b03f,
+        type: 3}
+      propertyPath: m_SortingLayer
+      value: -2
+      objectReference: {fileID: 0}
     - target: {fileID: 4560263303567151992, guid: 9b94993b6d7d76148802f08de293b03f,
         type: 3}
       propertyPath: m_Name
@@ -395,10 +424,30 @@ PrefabInstance:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: 56474e8d7e83e0e4abbcca38f04864c4, type: 2}
+    - target: {fileID: 4560263304097069573, guid: 9b94993b6d7d76148802f08de293b03f,
+        type: 3}
+      propertyPath: m_SortingLayerID
+      value: -425312291
+      objectReference: {fileID: 0}
+    - target: {fileID: 4560263304097069573, guid: 9b94993b6d7d76148802f08de293b03f,
+        type: 3}
+      propertyPath: m_SortingLayer
+      value: -2
+      objectReference: {fileID: 0}
     - target: {fileID: 4560263304486688643, guid: 9b94993b6d7d76148802f08de293b03f,
         type: 3}
       propertyPath: m_Volume
       value: 0.47
+      objectReference: {fileID: 0}
+    - target: {fileID: 4560263304681147352, guid: 9b94993b6d7d76148802f08de293b03f,
+        type: 3}
+      propertyPath: m_SortingLayerID
+      value: -425312291
+      objectReference: {fileID: 0}
+    - target: {fileID: 4560263304681147352, guid: 9b94993b6d7d76148802f08de293b03f,
+        type: 3}
+      propertyPath: m_SortingLayer
+      value: -2
       objectReference: {fileID: 0}
     - target: {fileID: 5167505136705482564, guid: 9b94993b6d7d76148802f08de293b03f,
         type: 3}

@@ -17,13 +17,10 @@ public class Unit : MonoBehaviour
     /// </summary>
     public Field FieldOfOperation;
 
-
     /// <summary>
     /// Type of this unit
     /// </summary>
     public UnitType UnitType;
-
-
 
     /// <summary>
     /// Range (in tiles) of this unit
@@ -41,22 +38,22 @@ public class Unit : MonoBehaviour
     /// Color of unit when disabled
     /// </summary>
     public UnityEngine.Color DisabledColor;
-    
-    public float m_unitZAxis;
 
-    /// <summary>
-    /// Player of the unit
-    /// </summary>
-    private Player Player;
 
     #endregion
 
     #region Private Members
+
     /// <summary>
     /// Position of an unit ona 2D grid
     /// </summary>
     private Point m_gridPosition;
-    
+
+    /// <summary>
+    /// Player of the unit
+    /// </summary>
+    public Player Player { get; set; }
+
     /// <summary>
     /// Sprite renderers of this unit
     /// </summary>
@@ -71,62 +68,53 @@ public class Unit : MonoBehaviour
     /// Manager of the current game played
     /// </summary>
     private Game m_game;
+
     /// <summary>
     /// Indicates if unit has played during this turn
-    /// </summary>
-    private bool m_hasMoved = false;
     /// <summary>
-    /// Indicates if unit has attacked during this turn
-    /// </summary>
+    private bool m_hasMoved = false;
+    
+    // Indicates if unit has attacked during this turn    
     private bool m_hasAttacked = false;
     /// <summary>
     /// When unit is disabled, no action is possible
     /// </summary>
     private bool m_disabled = false;
-    /// <summary>
-    /// When unit is disabled, no action is possible
-    /// </summary>
+
     private bool m_selected = false;
+       
+    private UnitView m_unitView;
 
-
-    private Animator m_anim;
-    private string m_coloredOutfitGameObjectTag = "playerColoredOutfit";
-
-    
-
-    #endregion
-
-    #region Game tags
+    private readonly string m_coloredOutfitGameObjectTag = "playerColoredOutfit";
 
     #endregion
 
     // Start is called before the first frame update
     void Start()
     {
-        retreiveSceneComponents();
-        assertUserDefinedValues();
+      
+        SetGame();
 
-        transform.position = new Vector3(transform.position.x, transform.position.y, m_unitZAxis);
+        if (MovementRange< 0)
+        {
+            throw new System.ArgumentOutOfRangeException("MovementRange cannot be < 0");
+        }
+
+        m_unitView = GetUnitView();
+        m_unitView.AssertUserDefinedValues();
+
+        transform.position = new Vector3(transform.position.x, transform.position.y, 0);
 
         if (Player != null)
         {
-            ApplyPlayerColor(Player.UnitColor);
+            m_unitView.ApplyPlayerColor(Player.UnitColor);
         }
         else
         {
             Tracer.Instance.Trace(TraceLevel.WARNING, "Player Null" );
         }
-        
     }
 
-    void Update()
-    {
-
-    }
-
-    /// <summary>
-    /// Describes the unit with its caracteristics
-    /// </summary>
     /// <returns>Description as a string</returns>
     public string Describe()
     {
@@ -138,63 +126,6 @@ public class Unit : MonoBehaviour
         Player = ai_player;     
     }
 
-    public Player GetPlayer()
-    {
-        return this.Player;
-    }
-
-    /// <summary>
-    /// Retreives components in the scene
-    /// </summary>
-    private void retreiveSceneComponents()
-    {
-        SpriteRenderer[] w_allChildrenSpriteRenderers = GetComponentsInChildren<SpriteRenderer>();
-
-        // filter all the renderers that must not change with the players' color
-        m_renderers = Array.FindAll(w_allChildrenSpriteRenderers, Sprite => Sprite.name != m_coloredOutfitGameObjectTag);       
-        if (m_renderers == null)
-        {
-            throw new System.NullReferenceException("m_renderers is null");
-        }
-
-        // filter all the renderers that must change with the players' color
-        m_coloredOutfitRenderers = Array.FindAll(w_allChildrenSpriteRenderers, Sprite => Sprite.name == m_coloredOutfitGameObjectTag);
-        if (m_coloredOutfitRenderers == null)
-        {
-            throw new System.NullReferenceException("m_coloredOutfitRenderers is null");
-        }
-
-        // game object
-        m_game = FindObjectOfType<Game>();
-        if (m_game == null)
-        {
-            throw new System.NullReferenceException("m_game is null");
-        }
-
-        m_anim = GetComponentsInChildren<Animator>()[0];
-        if (m_anim == null)
-        {
-            throw new System.NullReferenceException("m_anim is null");
-        }
-        m_anim.SetBool("isWalking", false);
-    }
-
-    private void assertUserDefinedValues()
-    {
-        // check for UnityConstruction values
-        if (HighlightedColor == null)
-        {
-            throw new System.NullReferenceException("HighlightedColor is null");
-        }
-        if (DisabledColor == null)
-        {
-            throw new System.NullReferenceException("DisabledColor is null");
-        }
-        if (MovementRange < 0)
-        {
-            throw new System.ArgumentOutOfRangeException("MovementRange cannot be < 0");
-        }
-    }
 
     #region User Interaction Functions
     /// <summary>
@@ -202,24 +133,17 @@ public class Unit : MonoBehaviour
     /// </summary>
     private void OnMouseDown()
     {
-        m_game.onSelectedUnit(this);
+       m_game.OnSelectedUnit(this);
     }
 
-    /// <summary>
-    /// Visually highlights the unit
-    /// </summary>
     public void SetSelected(bool ai_selected)
     {
-        m_selected = ai_selected;
-        if(m_selected)
-        {
-            ChangeSpritesColor(HighlightedColor);
-        }
-        else
-        {
-            ResetColorEffects();
-        }
+        m_selected = ai_selected;       
+    }
 
+    public void Highlight(bool highlight)
+    {
+        m_unitView.Highlight(highlight);
     }
 
     public void Kill()
@@ -227,25 +151,31 @@ public class Unit : MonoBehaviour
         Destroy(gameObject);
     }
 
-    /// <summary>
-    /// Disable the unit
-    /// </summary>
     public void Disable()
     {
         m_disabled = true;
-        ApplyDisabledColor();
+        m_unitView.ApplyDisabledColor();
     }
 
     public bool IsDisabled()
     {
         return m_disabled;
     }
+
+    public Point GetGridPosition()
+    {
+        return m_gridPosition;
+    }
+
     #endregion
 
     #region Public Functions
-    /// <summary>
-    /// Resets availability of the unit
-    /// </summary>
+
+    public void SetGridPosition (Point ai_gridPosition)
+    {
+        this.m_gridPosition = ai_gridPosition;
+    }
+
     public void ResetAvailability()
     {
         // reset played information
@@ -253,7 +183,7 @@ public class Unit : MonoBehaviour
         m_disabled = false;
         m_hasAttacked = false;
         // reset to default visual effect
-        ResetColorEffects();
+        m_unitView.ResetVisualEffects();
     }
     /// <summary>
     /// Sets the position of this unit on a 2D grid defined by a map
@@ -273,32 +203,27 @@ public class Unit : MonoBehaviour
         return m_gridPosition;
     }
 
-    /// <summary>
-    /// Consumes one attack of the unit
-    /// </summary>
+ 
     public void ConsumeAttack()
     {
         m_hasAttacked = true;
     }
 
-    /// <summary>
-    /// Tells if unit has consumed all of its attacks
-    /// </summary>
-    /// <returns></returns>
     public bool HasConsumedAllAttacks()
     {
         return m_hasAttacked;
     }
 
-    public IEnumerator moveTo(List<Tile> ai_path)
+    public IEnumerator MoveTo(List<Tile> ai_path)
     {
         foreach(Tile w_tile in ai_path)
         {
-            Tracer.Instance.Trace(TraceLevel.DEBUG, "GOTO -> " + w_tile.getGridPosition());
+            Tracer.Instance.Trace(TraceLevel.DEBUG, "GOTO -> " + w_tile.GetGridPosition());
             // deplacement
-            yield return StartMovement(w_tile.getGridPosition());
-            // storring position in grid
-            m_gridPosition = w_tile.getGridPosition();
+
+            yield return m_unitView.StartMovement(w_tile.GetGridPosition(), m_gridPosition.X, m_gridPosition.Y);
+            // storing position in grid
+            m_gridPosition = w_tile.GetGridPosition();
         }
         // unit has conumes its move
         m_hasMoved = true;
@@ -307,7 +232,6 @@ public class Unit : MonoBehaviour
     /// <summary>
     /// Tells if unit has consumed at least one action
     /// </summary>
-    /// <returns></returns>
     public bool HasConsumedActions()
     {
         return m_hasAttacked || m_hasMoved;
@@ -324,10 +248,6 @@ public class Unit : MonoBehaviour
         return !m_hasMoved;
     }
 
-    /// <summary>
-    /// tells if unit can attack
-    /// </summary>
-    /// <returns></returns>
     public bool CanAttack()
     {
         // TODO : implement remaining munition
@@ -335,78 +255,69 @@ public class Unit : MonoBehaviour
     }
     #endregion
 
-    #region Private Functions
+
+    private void SetGame()
+    {
+        // game object        
+        m_game = FindObjectOfType<Game>();
+        if (m_game == null)
+        {
+            throw new System.NullReferenceException("m_game is null");
+        }
+    }
+
     /// <summary>
-    /// Resets all visual effects on the unit
+    /// Retreives components in the scene
     /// </summary>
-    private void ResetColorEffects()
+    private UnitView GetUnitView()
     {
-        ChangeSpritesColor(UnityEngine.Color.white);
+        UnitView unitView = new UnitView(this.gameObject);
+
+        SpriteRenderer[] w_allChildrenSpriteRenderers = GetComponentsInChildren<SpriteRenderer>();
+
+
+        // filter all the renderers that must not change with the players' color
+        unitView.m_renderers = GetRenderers(w_allChildrenSpriteRenderers);
+
+        // filter all the renderers that must change with the players' color
+        unitView.m_coloredOutfitRenderers = GetColoredOutfitRenderers(w_allChildrenSpriteRenderers);
+          
+        unitView.m_anim = GetAnim();
+
+        unitView.DisabledUnitColor = this.DisabledColor;
+        unitView.SelectedUnitColor = this.HighlightedColor;
+
+        return unitView;
     }
 
-    private void ChangeSpritesColor(UnityEngine.Color ai_color)
+    private Animator GetAnim()
     {
-        Array.ForEach(m_renderers, sprite => sprite.color = ai_color);       
-    }
-
-
-    private IEnumerator StartMovement(Point ai_newPosition)
-    {
-        // start walking animation
-        m_anim.SetBool(UnityAnimationTags.IsWalking, true);
-        
-        float w_targetPositionX = transform.position.x + (ai_newPosition.X - m_gridPosition.X);
-        float w_targetPositionY = transform.position.y + (ai_newPosition.Y - m_gridPosition.Y);
-
-        // turn sprite in proper direction
-        SetDirection(transform.position.x, w_targetPositionX);
-        
-        yield return MoveHorizontally(w_targetPositionX);
-        yield return MoveVertically(w_targetPositionY);
-        
-        // stop walkin annimation
-        m_anim.SetBool(UnityAnimationTags.IsWalking, false);
-    }
-
-    private IEnumerator MoveHorizontally(float ai_targetPositionX)
-    {
-        while (!IsCloseEnoughToTargetPosition(transform.position.x, ai_targetPositionX))
+        Animator w_anim = GetComponentsInChildren<Animator>()[0];
+        if (w_anim == null)
         {
-            transform.position = Vector3.MoveTowards(transform.position, new Vector3(ai_targetPositionX, transform.position.y, m_unitZAxis), MoveSpeed * Time.deltaTime);
-            yield return null;
+            throw new System.NullReferenceException("m_anim is null");
         }
+        w_anim.SetBool("isWalking", false);
+        return w_anim;
     }
 
-    private IEnumerator MoveVertically(float ai_targetPositionY)
+    private SpriteRenderer[] GetRenderers(SpriteRenderer[] ai_allChildrenSpriteRenderers)
     {
-        while (!IsCloseEnoughToTargetPosition(transform.position.y, ai_targetPositionY))
+        SpriteRenderer[] w_renderers = Array.FindAll(ai_allChildrenSpriteRenderers, Sprite => Sprite.name != m_coloredOutfitGameObjectTag);
+        if (w_renderers == null)
         {
-            transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, ai_targetPositionY, m_unitZAxis), MoveSpeed * Time.deltaTime);
-            yield return null;
+            throw new System.NullReferenceException("m_renderers is null");
         }
+        return w_renderers;
     }
 
-    private void SetDirection(float ai_positionX, float ai_targetPositionX)
+    private SpriteRenderer[] GetColoredOutfitRenderers(SpriteRenderer[] ai_allChildrenSpriteRenderers)
     {
-        if(ai_positionX != ai_targetPositionX)
+        SpriteRenderer[] w_coloredOutfitRenderers = Array.FindAll(ai_allChildrenSpriteRenderers, Sprite => Sprite.name == m_coloredOutfitGameObjectTag);
+        if (w_coloredOutfitRenderers == null)
         {
-            transform.eulerAngles = ai_positionX < ai_targetPositionX ? new Vector3(0, 180, 0) : new Vector3(0, 0, 0);
-        }        
+            throw new System.NullReferenceException("m_coloredOutfitRenderers is null");
+        }
+        return w_coloredOutfitRenderers;
     }
-
-    private bool IsCloseEnoughToTargetPosition(float ai_position, float ai_targetPosition)
-    {
-        return Math.Abs(ai_position - ai_targetPosition) < 0.001f;
-    }
-
-    private void ApplyPlayerColor(UnityEngine.Color unitColors)
-    {
-        Array.ForEach(m_coloredOutfitRenderers, sprite => sprite.color = unitColors);
-    }
-
-    private void ApplyDisabledColor()
-    {
-        ChangeSpritesColor(DisabledColor);
-    }
-    #endregion
 }
