@@ -315,18 +315,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 3985818316487221867}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 13bed2d7f56dae349b903b5d42550b2b, type: 3}
+  m_Script: {fileID: 11500000, guid: 775f754f4c792da41831d000b1c33415, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   FieldOfOperation: 0
   UnitType: 0
-  MovementRange: 8
-  MoveSpeed: 4
-  HighlightedColor: {r: 1, g: 1, b: 1, a: 0.7294118}
-  DisabledColor: {r: 0.5294118, g: 0.5294118, b: 0.5294118, a: 1}
-  m_unitZAxis: 0
-  m_TargetPrefab: {fileID: 7456374009438899483, guid: 87197692133757642b85d514f2dd4021,
-    type: 3}
+  MovementRange: 10
+  MoveSpeed: 10
+  HighlightedColor: {r: 1, g: 0.9792701, b: 0, a: 1}
+  DisabledColor: {r: 0, g: 0, b: 0, a: 0.40392157}
 --- !u!212 &2085508483
 SpriteRenderer:
   m_ObjectHideFlags: 0

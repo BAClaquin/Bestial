@@ -17,13 +17,10 @@ public class Unit : MonoBehaviour
     /// </summary>
     public Field FieldOfOperation;
 
-
     /// <summary>
     /// Type of this unit
     /// </summary>
     public UnitType UnitType;
-
-
 
     /// <summary>
     /// Range (in tiles) of this unit
@@ -41,19 +38,15 @@ public class Unit : MonoBehaviour
     /// Color of unit when disabled
     /// </summary>
     public UnityEngine.Color DisabledColor;
-    
-    public float m_unitZAxis;
 
-    
+    #endregion
+
+    #region Private Members
 
     /// <summary>
     /// Player of the unit
     /// </summary>
     private Player Player;
-
-    #endregion
-
-    #region Private Members
 
 
     /// <summary>
@@ -97,6 +90,8 @@ public class Unit : MonoBehaviour
     private string m_coloredOutfitGameObjectTag = "playerColoredOutfit";
 
     private float m_selectUnitResizeScale = 1.5f;
+
+    // Unit gets bigger when selected
     private bool m_isBig = false;
 
     #endregion
@@ -111,7 +106,7 @@ public class Unit : MonoBehaviour
         retreiveSceneComponents();
         assertUserDefinedValues();
 
-        transform.position = new Vector3(transform.position.x, transform.position.y, m_unitZAxis);
+        transform.position = new Vector3(transform.position.x, transform.position.y, 0);
 
         if (Player != null)
         {
@@ -121,10 +116,7 @@ public class Unit : MonoBehaviour
         {
             Tracer.Instance.Trace(TraceLevel.WARNING, "Player Null" );
         }
-        
     }
-
-
 
     void Update()
     {
@@ -150,59 +142,6 @@ public class Unit : MonoBehaviour
         return this.Player;
     }
 
-    /// <summary>
-    /// Retreives components in the scene
-    /// </summary>
-    private void retreiveSceneComponents()
-    {
-        SpriteRenderer[] w_allChildrenSpriteRenderers = GetComponentsInChildren<SpriteRenderer>();
-
-        // filter all the renderers that must not change with the players' color
-        m_renderers = Array.FindAll(w_allChildrenSpriteRenderers, Sprite => Sprite.name != m_coloredOutfitGameObjectTag);       
-        if (m_renderers == null)
-        {
-            throw new System.NullReferenceException("m_renderers is null");
-        }
-
-        // filter all the renderers that must change with the players' color
-        m_coloredOutfitRenderers = Array.FindAll(w_allChildrenSpriteRenderers, Sprite => Sprite.name == m_coloredOutfitGameObjectTag);
-        if (m_coloredOutfitRenderers == null)
-        {
-            throw new System.NullReferenceException("m_coloredOutfitRenderers is null");
-        }
-
-        // game object
-        m_game = FindObjectOfType<Game>();
-        if (m_game == null)
-        {
-            throw new System.NullReferenceException("m_game is null");
-        }
-
-        m_anim = GetComponentsInChildren<Animator>()[0];
-        if (m_anim == null)
-        {
-            throw new System.NullReferenceException("m_anim is null");
-        }
-        m_anim.SetBool("isWalking", false);
-    }
-
-    private void assertUserDefinedValues()
-    {
-        // check for UnityConstruction values
-        if (HighlightedColor == null)
-        {
-            throw new System.NullReferenceException("HighlightedColor is null");
-        }
-        if (DisabledColor == null)
-        {
-            throw new System.NullReferenceException("DisabledColor is null");
-        }
-        if (MovementRange < 0)
-        {
-            throw new System.ArgumentOutOfRangeException("MovementRange cannot be < 0");
-        }
-    }
-
     #region User Interaction Functions
     /// <summary>
     /// Occurs when user click on this unit
@@ -217,8 +156,12 @@ public class Unit : MonoBehaviour
     /// </summary>
     public void SetSelected(bool ai_selected)
     {
-        m_selected = ai_selected;
-        if(m_selected)
+        m_selected = ai_selected;       
+    }
+
+    public void Highlight(bool highlight)
+    {
+        if (highlight)
         {
             MakeUnitBigger();
             ChangeSpritesColor(HighlightedColor);
@@ -227,26 +170,6 @@ public class Unit : MonoBehaviour
         {
             MakeUnitSmaller();
             ResetColorEffects();
-        }
-    }
-
-
-    private void MakeUnitBigger()
-    {
-        if (!m_isBig) { 
-            transform.localScale = new Vector3(transform.localScale.x * m_selectUnitResizeScale, transform.localScale.x * m_selectUnitResizeScale, transform.localScale.x * m_selectUnitResizeScale);
-            transform.position = new Vector3(transform.position.x, transform.position.y, m_unitZAxis + 1);
-            m_isBig = true;
-        }
-    }
-
-    private void MakeUnitSmaller()
-    {
-        if (m_isBig)
-        {
-            transform.localScale = new Vector3(transform.localScale.x / m_selectUnitResizeScale, transform.localScale.x / m_selectUnitResizeScale, transform.localScale.x / m_selectUnitResizeScale);
-            transform.position = new Vector3(transform.position.x, transform.position.y, m_unitZAxis);
-            m_isBig = false;
         }
     }
 
@@ -400,7 +323,7 @@ public class Unit : MonoBehaviour
     {
         while (!IsCloseEnoughToTargetPosition(transform.position.x, ai_targetPositionX))
         {
-            transform.position = Vector3.MoveTowards(transform.position, new Vector3(ai_targetPositionX, transform.position.y, m_unitZAxis), MoveSpeed * Time.deltaTime);
+            transform.position = Vector3.MoveTowards(transform.position, new Vector3(ai_targetPositionX, transform.position.y, 0), MoveSpeed * Time.deltaTime);
             yield return null;
         }
     }
@@ -409,7 +332,7 @@ public class Unit : MonoBehaviour
     {
         while (!IsCloseEnoughToTargetPosition(transform.position.y, ai_targetPositionY))
         {
-            transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, ai_targetPositionY, m_unitZAxis), MoveSpeed * Time.deltaTime);
+            transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, ai_targetPositionY, 0), MoveSpeed * Time.deltaTime);
             yield return null;
         }
     }
@@ -435,6 +358,82 @@ public class Unit : MonoBehaviour
     private void ApplyDisabledColor()
     {
         ChangeSpritesColor(DisabledColor);
+    }
+
+
+    private void MakeUnitBigger()
+    {
+        if (!m_isBig)
+        {
+            transform.localScale = new Vector3(transform.localScale.x * m_selectUnitResizeScale, transform.localScale.x * m_selectUnitResizeScale, transform.localScale.x * m_selectUnitResizeScale);
+            transform.position = new Vector3(transform.position.x, transform.position.y, -1);
+            m_isBig = true;
+        }
+    }
+
+    private void MakeUnitSmaller()
+    {
+        if (m_isBig)
+        {
+            transform.localScale = new Vector3(transform.localScale.x / m_selectUnitResizeScale, transform.localScale.x / m_selectUnitResizeScale, transform.localScale.x / m_selectUnitResizeScale);
+            transform.position = new Vector3(transform.position.x, transform.position.y, 0);
+            m_isBig = false;
+        }
+    }
+
+
+    /// <summary>
+    /// Retreives components in the scene
+    /// </summary>
+    private void retreiveSceneComponents()
+    {
+        SpriteRenderer[] w_allChildrenSpriteRenderers = GetComponentsInChildren<SpriteRenderer>();
+
+        // filter all the renderers that must not change with the players' color
+        m_renderers = Array.FindAll(w_allChildrenSpriteRenderers, Sprite => Sprite.name != m_coloredOutfitGameObjectTag);
+        if (m_renderers == null)
+        {
+            throw new System.NullReferenceException("m_renderers is null");
+        }
+
+        // filter all the renderers that must change with the players' color
+        m_coloredOutfitRenderers = Array.FindAll(w_allChildrenSpriteRenderers, Sprite => Sprite.name == m_coloredOutfitGameObjectTag);
+        if (m_coloredOutfitRenderers == null)
+        {
+            throw new System.NullReferenceException("m_coloredOutfitRenderers is null");
+        }
+
+        // game object
+        m_game = FindObjectOfType<Game>();
+        if (m_game == null)
+        {
+            throw new System.NullReferenceException("m_game is null");
+        }
+
+        m_anim = GetComponentsInChildren<Animator>()[0];
+        if (m_anim == null)
+        {
+            throw new System.NullReferenceException("m_anim is null");
+        }
+        m_anim.SetBool("isWalking", false);
+    }
+
+
+    private void assertUserDefinedValues()
+    {
+        // check for UnityConstruction values
+        if (HighlightedColor == null)
+        {
+            throw new System.NullReferenceException("HighlightedColor is null");
+        }
+        if (DisabledColor == null)
+        {
+            throw new System.NullReferenceException("DisabledColor is null");
+        }
+        if (MovementRange < 0)
+        {
+            throw new System.ArgumentOutOfRangeException("MovementRange cannot be < 0");
+        }
     }
     #endregion
 }
