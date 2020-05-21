@@ -63,7 +63,6 @@ public class Game : MonoBehaviour,IGame
 
     #region Private Members
     Unit m_selectedUnit;
-    bool m_actionAfterMoveMode = false;
     List<Unit> m_targetableUnits;
     #endregion
 
@@ -218,6 +217,23 @@ public class Game : MonoBehaviour,IGame
     #endregion
 
     #region Private Functions
+
+    /// <summary>
+    /// Resets the current action
+    /// </summary>
+    void resetCurrentAction()
+    {
+        if (m_selectedUnit != null)
+        {
+            // reset highlighted tiles
+            CurrentMap.ResetAvailableMoves();
+            // no unit is being selected
+            m_selectedUnit = null;
+        }
+        // else no actions to reset for the moment
+    }
+
+
     public bool UnitCanMoveToTile(Unit ai_unit, Tile ai_tile)
     {
         return ai_tile.isTaggedAccessible() && ai_unit.CanMove() && UnitBelongsToCurrentPlayer(ai_unit);

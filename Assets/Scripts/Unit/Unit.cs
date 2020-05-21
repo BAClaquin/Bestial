@@ -44,6 +44,8 @@ public class Unit : MonoBehaviour
     
     public float m_unitZAxis;
 
+    
+
     /// <summary>
     /// Player of the unit
     /// </summary>
@@ -52,6 +54,8 @@ public class Unit : MonoBehaviour
     #endregion
 
     #region Private Members
+
+
     /// <summary>
     /// Position of an unit ona 2D grid
     /// </summary>
@@ -92,7 +96,8 @@ public class Unit : MonoBehaviour
     private Animator m_anim;
     private string m_coloredOutfitGameObjectTag = "playerColoredOutfit";
 
-    
+    private float m_selectUnitResizeScale = 1.5f;
+    private bool m_isBig = false;
 
     #endregion
 
@@ -118,6 +123,8 @@ public class Unit : MonoBehaviour
         }
         
     }
+
+
 
     void Update()
     {
@@ -202,7 +209,7 @@ public class Unit : MonoBehaviour
     /// </summary>
     private void OnMouseDown()
     {
-        m_game.onSelectedUnit(this);
+       m_game.onSelectedUnit(this);
     }
 
     /// <summary>
@@ -213,13 +220,34 @@ public class Unit : MonoBehaviour
         m_selected = ai_selected;
         if(m_selected)
         {
+            MakeUnitBigger();
             ChangeSpritesColor(HighlightedColor);
         }
         else
         {
+            MakeUnitSmaller();
             ResetColorEffects();
         }
+    }
 
+
+    private void MakeUnitBigger()
+    {
+        if (!m_isBig) { 
+            transform.localScale = new Vector3(transform.localScale.x * m_selectUnitResizeScale, transform.localScale.x * m_selectUnitResizeScale, transform.localScale.x * m_selectUnitResizeScale);
+            transform.position = new Vector3(transform.position.x, transform.position.y, m_unitZAxis + 1);
+            m_isBig = true;
+        }
+    }
+
+    private void MakeUnitSmaller()
+    {
+        if (m_isBig)
+        {
+            transform.localScale = new Vector3(transform.localScale.x / m_selectUnitResizeScale, transform.localScale.x / m_selectUnitResizeScale, transform.localScale.x / m_selectUnitResizeScale);
+            transform.position = new Vector3(transform.position.x, transform.position.y, m_unitZAxis);
+            m_isBig = false;
+        }
     }
 
     public void Kill()

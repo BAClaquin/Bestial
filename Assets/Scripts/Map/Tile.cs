@@ -29,6 +29,10 @@ public class Tile : MonoBehaviour
 
     [Header(UnityHeaders.Visuals)]
     public UnityEngine.Color AttackPossibleColor;
+
+    // Reference to the target prefab 
+    public GameObject m_TargetPrefab;
+    
     #endregion
 
     #region Private Members
@@ -44,6 +48,8 @@ public class Tile : MonoBehaviour
     /// Manager of the current game played
     /// </summary>
     private Game m_game;
+
+    private GameObject m_target;
     #endregion
 
     #region Public Functions
@@ -73,7 +79,7 @@ public class Tile : MonoBehaviour
     void Start()
     {
         retreiveSceneComponents();
-        assertUserDefinedValues();
+        assertUserDefinedValues();        
     }
 
     /// <summary>
@@ -145,6 +151,7 @@ public class Tile : MonoBehaviour
     public void SetAsAttackable()
     {
         m_render.color = AttackPossibleColor;
+        displayTarget();
     }
 
     /// <summary>
@@ -166,6 +173,7 @@ public class Tile : MonoBehaviour
     {
         m_tagMovePossible = false;
         m_render.color = UnityEngine.Color.white;
+        removeTarget();
     }
 
     /// <summary>
@@ -176,5 +184,20 @@ public class Tile : MonoBehaviour
     {
         return m_tagMovePossible;
     }
+
+    private void displayTarget()
+    {
+        m_target = Instantiate(m_TargetPrefab, transform.position, Quaternion.identity);
+    }
+
+    private void removeTarget()
+    {
+        if(m_target != null)
+        {
+            Destroy(m_target);
+        }
+        
+    }
+
     #endregion
 }

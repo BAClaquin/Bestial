@@ -40,15 +40,21 @@ TagManager:
   - 
   - 
   m_SortingLayers:
-  - name: Default
-    uniqueID: 0
-    locked: 0
-  - name: UNITS
-    uniqueID: 3869655005
-    locked: 0
   - name: MAP_BACKGROUND
     uniqueID: 1753619081
     locked: 0
   - name: MAP_BASE
     uniqueID: 2523398185
+    locked: 0
+  - name: MAP_OVERLAYS
+    uniqueID: 2595041787
+    locked: 0
+  - name: UNITS
+    uniqueID: 3869655005
+    locked: 0
+  - name: OVERLAYS
+    uniqueID: 3502457029
+    locked: 0
+  - name: Default
+    uniqueID: 0
     locked: 0
