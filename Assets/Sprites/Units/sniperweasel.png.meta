@@ -20,6 +20,9 @@ TextureImporter:
   - first:
       213: -5032509486818698525
     second: sniperweasel_5
+  - first:
+      213: 1043876573227481744
+    second: sniperweasel_6
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -135,7 +138,7 @@ TextureImporter:
         x: 172
         y: 944
         width: 314
-        height: 256
+        height: 213
       alignment: 9
       pivot: {x: 0.49579576, y: -0.00020623207}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -174,9 +177,9 @@ TextureImporter:
       name: sniperweasel_2
       rect:
         serializedVersion: 2
-        x: 204
-        y: 766
-        width: 115
+        x: 121
+        y: 767
+        width: 120
         height: 99
       alignment: 9
       pivot: {x: 0.6721908, y: 0.953379}
@@ -195,8 +198,8 @@ TextureImporter:
       name: sniperweasel_3
       rect:
         serializedVersion: 2
-        x: 514
-        y: 764
+        x: 274
+        y: 766
         width: 121
         height: 100
       alignment: 9
@@ -229,6 +232,48 @@ TextureImporter:
       bones: []
       spriteID: e798c531bb25d7c30800000000000000
       internalID: 4358730977801701758
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sniperweasel_5
+      rect:
+        serializedVersion: 2
+        x: 777
+        y: 460
+        width: 311
+        height: 195
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3ea536df84fe82ab0800000000000000
+      internalID: -5032509486818698525
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sniperweasel_6
+      rect:
+        serializedVersion: 2
+        x: 546
+        y: 523
+        width: 153
+        height: 143
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 09a739076389c7e00800000000000000
+      internalID: 1043876573227481744
       vertices: []
       indices: 
       edges: []
