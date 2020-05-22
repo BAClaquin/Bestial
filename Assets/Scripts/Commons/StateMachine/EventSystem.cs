@@ -18,6 +18,12 @@ namespace StateMachine
         void Consume();
 
         /// <summary>
+        /// Rejects the event : 
+        /// Foprce to not occured.
+        /// </summary>
+        void Reject();
+
+        /// <summary>
         /// Indicates if event has occured
         /// </summary>
         /// <returns>True if has occured, false otherwise</returns>
@@ -49,6 +55,14 @@ namespace StateMachine
             {
                 throw new System.Exception("Trying to consume an event that has not occured");
             }
+            m_occured = false;
+        }
+
+        /// <summary>
+        /// Force event to not occured.
+        /// </summary>
+        public void Reject()
+        {
             m_occured = false;
         }
 
@@ -190,11 +204,11 @@ namespace StateMachine
         /// <summary>
         /// Consumes all events
         /// </summary>
-        protected void ConsumeAllEvents()
+        public void RejectAllEvents()
         {
             foreach (var w_event in m_possibleEvents)
             {
-                w_event.Consume();
+                w_event.Reject();
             }
         }
     }

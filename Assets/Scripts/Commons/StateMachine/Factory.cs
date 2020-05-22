@@ -23,7 +23,7 @@ namespace StateMachine
             m_worker = new TStateMachineWorker();
             m_game = ai_game;
             m_eventSystem = new TEventSystem();
-            m_stateMachine = new StateMachine<TStateEnum, TStateMachineWorker, TEventConsumer, TEventEmiter>(m_worker, m_eventSystem, m_eventSystem, m_game);
+            m_stateMachine = new StateMachine<TStateEnum, TStateMachineWorker, TEventConsumer, TEventEmiter>(m_worker, m_eventSystem, m_eventSystem, m_eventSystem, m_game);
         }
         #endregion
 

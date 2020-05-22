@@ -110,6 +110,10 @@ namespace StateMachine
         /// </summary>
         TEventEmiter m_eventEmiter;
 
+        /// <summary>
+        /// Base event system to consume all events
+        /// </summary>
+        BaseEventSystem m_eventSystem;
 
         /// <summary>
         /// Game interface
@@ -123,12 +127,13 @@ namespace StateMachine
         /// </summary>
         /// <param name="ai_configuration">COndigfuration of states and transitions</param>
         /// <param name="ai_worker">External worker the state machine can work with</param>
-        public StateMachine(TStateMachineWorker ai_worker, TEventConsumer ai__eventConsumer,  TEventEmiter ai_eventEmiter, IGame ai_game)
+        public StateMachine(TStateMachineWorker ai_worker, BaseEventSystem ai_eventSystem, TEventConsumer ai__eventConsumer,  TEventEmiter ai_eventEmiter, IGame ai_game)
         {
             m_isStarted = false;
             m_worker = ai_worker;
             m_eventConsumer = ai__eventConsumer;
             m_eventEmiter = ai_eventEmiter;
+            m_eventSystem = ai_eventSystem;
             m_game = ai_game;
         }
         #endregion
@@ -196,7 +201,8 @@ namespace StateMachine
             // if not : end for this computeState
             if (w_transitionToExecute == null)
             {
-                // TOOD : consommer les events s'il n'ont pas été pris ?
+                // reject all raised events that were not consumed.
+                m_eventSystem.RejectAllEvents();
                 return;
             }
 
