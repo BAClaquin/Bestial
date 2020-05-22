@@ -8,7 +8,7 @@ using UnityEngine;
 namespace GameStateMachine
 {
 
-    class Factory : AFactory<GameStates, GameWorker, GameEventSytstem>
+    class Factory : AFactory<GameStates, GameWorker, GameEventSytstem, IGameEventConsumer, IGameEventEmiter>
     {
 
         public Factory(IGame ai_game) : base(ai_game) { }

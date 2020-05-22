@@ -5,11 +5,10 @@ using UnityEngine;
 
 namespace StateMachine
 {
-
     /// <summary>
     /// Interface for state machine destinated for using it
     /// </summary>
-    public interface IStateMachine<TEventSystem>
+    public interface IStateMachine<TEventEmiter>
     {
         /// <summary>
         /// Starts the state machine
@@ -30,14 +29,14 @@ namespace StateMachine
         /// Provides access to event system
         /// </summary>
         /// <returns>State machine event system</returns>
-        TEventSystem GetEventSystem();
+        TEventEmiter GetEventEmiter();
     }
 
     /// <summary>
     /// Interface destinated to members of the state machine to acces state machine data
     /// Provides acces to all data necessary for states and transition to operate
     /// </summary>
-    public interface IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventSystem>
+    public interface IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventConsumer>
         where TStateEnum : System.Enum
         where TStateMachineWorker : IStateMachineWorker
     {
@@ -45,13 +44,13 @@ namespace StateMachine
         /// Provides current state of the stateMachine
         /// </summary>
         /// <returns>The current state</returns>
-        State<TStateEnum, TStateMachineWorker,TEventSystem> GetCurrentState();
+        State<TStateEnum, TStateMachineWorker,TEventConsumer> GetCurrentState();
 
         /// <summary>
         /// Provides access to event system
         /// </summary>
         /// <returns>State machine event system</returns>
-        TEventSystem GetEventSystem();
+        TEventConsumer GetEventConsumer();
 
         /// <summary>
         /// Provies acces to state machien worker
@@ -66,10 +65,12 @@ namespace StateMachine
         IGame GetGame();
     }
 
+
+
     /// <summary>
     /// State Machine
     /// </summary>
-    public class StateMachine<TStateEnum, TStateMachineWorker, TEventSystem> : IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventSystem>, IStateMachine<TEventSystem>
+    public class StateMachine<TStateEnum, TStateMachineWorker, TEventConsumer, TEventEmiter> : IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventConsumer >, IStateMachine<TEventEmiter>
         where TStateEnum : System.Enum
         where TStateMachineWorker : IStateMachineWorker
     {
@@ -77,12 +78,12 @@ namespace StateMachine
         /// <summary>
         /// Current state of the state machine
         /// </summary>
-        State<TStateEnum, TStateMachineWorker, TEventSystem> m_currentState;
+        State<TStateEnum, TStateMachineWorker,TEventConsumer> m_currentState;
 
         /// <summary>
         /// Configuration of states and transition for the state machine
         /// </summary>
-        Configuration<TStateEnum, TStateMachineWorker, TEventSystem> m_configuration;
+        Configuration<TStateEnum, TStateMachineWorker, TEventConsumer> m_configuration;
 
         /// <summary>
         /// Is state machine started
@@ -97,12 +98,18 @@ namespace StateMachine
         /// <summary>
         /// Eligible transitions for current state
         /// </summary>
-        List<Transition<TStateEnum, TStateMachineWorker, TEventSystem>> m_eligibleTransitions;
+        List<Transition<TStateEnum, TStateMachineWorker, TEventConsumer>> m_eligibleTransitions;
 
         /// <summary>
-        /// Event system for the state machine
+        /// Event system for the state machine : for consumer
         /// </summary>
-        TEventSystem m_eventSystem;
+        TEventConsumer m_eventConsumer;
+
+        /// <summary>
+        /// Event system for the state machine : for consumer
+        /// </summary>
+        TEventEmiter m_eventEmiter;
+
 
         /// <summary>
         /// Game interface
@@ -116,17 +123,18 @@ namespace StateMachine
         /// </summary>
         /// <param name="ai_configuration">COndigfuration of states and transitions</param>
         /// <param name="ai_worker">External worker the state machine can work with</param>
-        public StateMachine(TStateMachineWorker ai_worker, TEventSystem ai_eventSystem, IGame ai_game)
+        public StateMachine(TStateMachineWorker ai_worker, TEventConsumer ai__eventConsumer,  TEventEmiter ai_eventEmiter, IGame ai_game)
         {
             m_isStarted = false;
             m_worker = ai_worker;
-            m_eventSystem = ai_eventSystem;
+            m_eventConsumer = ai__eventConsumer;
+            m_eventEmiter = ai_eventEmiter;
             m_game = ai_game;
         }
         #endregion
 
         #region Public Functions
-        public void setConfiguration(Configuration<TStateEnum, TStateMachineWorker, TEventSystem> ai_configuration)
+        public void setConfiguration(Configuration<TStateEnum, TStateMachineWorker, TEventConsumer> ai_configuration)
         {
             m_configuration = ai_configuration;
             m_currentState = m_configuration.getStartState();
@@ -136,7 +144,7 @@ namespace StateMachine
         /// Provides current state of the stateMachine
         /// </summary>
         /// <returns>The current state</returns>
-        public State<TStateEnum, TStateMachineWorker, TEventSystem> GetCurrentState()
+        public State<TStateEnum, TStateMachineWorker, TEventConsumer> GetCurrentState()
         {
             return m_currentState;
         }
@@ -184,7 +192,7 @@ namespace StateMachine
             m_currentState.OnState();
 
             // see if one transition is possible
-            Transition<TStateEnum, TStateMachineWorker, TEventSystem> w_transitionToExecute = LookForPossibleTransition(m_eligibleTransitions);
+            Transition<TStateEnum, TStateMachineWorker, TEventConsumer> w_transitionToExecute = LookForPossibleTransition(m_eligibleTransitions);
             // if not : end for this computeState
             if (w_transitionToExecute == null)
             {
@@ -203,7 +211,7 @@ namespace StateMachine
         /// Calls onEnter function for this state
         /// </summary>
         /// <param name="ai_state">Current state to set</param>
-        private void SetCurrentState(State<TStateEnum, TStateMachineWorker, TEventSystem> ai_state)
+        private void SetCurrentState(State<TStateEnum, TStateMachineWorker, TEventConsumer> ai_state)
         {
             m_currentState = ai_state;
             // execute state enter function
@@ -219,7 +227,7 @@ namespace StateMachine
         /// </summary>
         /// <param name="ai_eligibleTransitions">Transitions you want to test</param>
         /// <returns>A traistion if one foud, null otherwise</returns>
-        private Transition<TStateEnum, TStateMachineWorker, TEventSystem> LookForPossibleTransition(List<Transition<TStateEnum, TStateMachineWorker, TEventSystem>> ai_eligibleTransitions)
+        private Transition<TStateEnum, TStateMachineWorker, TEventConsumer> LookForPossibleTransition(List<Transition<TStateEnum, TStateMachineWorker, TEventConsumer>> ai_eligibleTransitions)
         {
             foreach (var transition in ai_eligibleTransitions)
             {
@@ -239,7 +247,7 @@ namespace StateMachine
         /// Enters new current state with OnEnter action called
         /// </summary>
         /// <param name="ai_transition">The transition to execute</param>
-        private void ExecuteTransition(Transition<TStateEnum, TStateMachineWorker, TEventSystem> ai_transition)
+        private void ExecuteTransition(Transition<TStateEnum, TStateMachineWorker, TEventConsumer> ai_transition)
         {
             // precondition
             if (!m_currentState.ID.Equals(ai_transition.From))
@@ -257,12 +265,21 @@ namespace StateMachine
         }
 
         /// <summary>
-        /// Provides acces to state amchine event system
+        /// Provides acces to state machine event system for Consumer
         /// </summary>
         /// <returns></returns>
-        public TEventSystem GetEventSystem()
+        public TEventConsumer GetEventConsumer()
         {
-            return m_eventSystem;
+            return m_eventConsumer;
+        }
+
+        /// <summary>
+        /// Provides acces to state machine event system for Emiter
+        /// </summary>
+        /// <returns></returns>
+        public  TEventEmiter GetEventEmiter()
+        {
+            return m_eventEmiter;
         }
 
         public TStateMachineWorker GetWorker()

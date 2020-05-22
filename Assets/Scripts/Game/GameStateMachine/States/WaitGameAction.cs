@@ -8,9 +8,6 @@ using System.Threading.Tasks;
 
 namespace GameStateMachine
 {
-
-    using IInternalStateMachine = IInternalStateMachine<GameStates, GameWorker, GameEventSytstem>;
-
     public class WaitGameAction : GameState
     {
         public WaitGameAction(): base(GameStates.WAIT_GAME_ACTION) {}

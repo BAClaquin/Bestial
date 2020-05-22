@@ -6,15 +6,17 @@ using UnityEngine;
 namespace StateMachine
 {
 
-    public delegate bool EvaluateConditionDelegate<TStateEnum, TStateMachineWorker, TEventSystem>(IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventSystem> ai_internalStateMachine)
+    public delegate bool EvaluateConditionDelegate<TStateEnum, TStateMachineWorker, TEventConsumer>(IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventConsumer> ai_internalStateMachine)
         where TStateEnum : System.Enum
         where TStateMachineWorker : IStateMachineWorker;
 
-    public delegate void OnTransitionDelegate<TStateEnum, TStateMachineWorker, TEventSystem>(IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventSystem> ai_internalStateMachine)
-                where TStateEnum : System.Enum
+
+    public delegate void OnTransitionDelegate<TStateEnum, TStateMachineWorker, TEventConsumer>(IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventConsumer> ai_internalStateMachine)
+        where TStateEnum : System.Enum
         where TStateMachineWorker : IStateMachineWorker;
 
-    public class Transition<TStateEnum, TStateMachineWorker, TEventSystem>
+
+    public class Transition<TStateEnum, TStateMachineWorker, TEventConsumer>
         where TStateEnum : System.Enum
         where TStateMachineWorker : IStateMachineWorker
     {
@@ -30,14 +32,14 @@ namespace StateMachine
         #endregion
 
         #region Private Members
-        IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventSystem> m_internalStateMachine;
-        TransitionBehaviour<TStateEnum, TStateMachineWorker, TEventSystem> m_transitionBehaviour;
+        IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventConsumer> m_internalStateMachine;
+        TransitionBehaviour<TStateEnum, TStateMachineWorker, TEventConsumer> m_transitionBehaviour;
         #endregion
 
         #region Constructors
         public Transition(TStateEnum ai_from, TStateEnum ai_to,
-            TransitionBehaviour<TStateEnum, TStateMachineWorker, TEventSystem> ai_transitionBehaviour,
-            IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventSystem> ai_stateMachine)
+            TransitionBehaviour<TStateEnum, TStateMachineWorker, TEventConsumer> ai_transitionBehaviour,
+            IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventConsumer> ai_stateMachine)
         {
             From = ai_from;
             To = ai_to;
@@ -52,7 +54,7 @@ namespace StateMachine
         /// </summary>
         /// <param name="ai_other">other transition you wanna test equality for</param>
         /// <returns>True if FROM and TO are the same, false otherwise</returns>
-        public bool isSameTransition(Transition<TStateEnum, TStateMachineWorker, TEventSystem> ai_other)
+        public bool isSameTransition(Transition<TStateEnum, TStateMachineWorker, TEventConsumer> ai_other)
         {
             return From.Equals(ai_other.From) && To.Equals(ai_other.To);
         }

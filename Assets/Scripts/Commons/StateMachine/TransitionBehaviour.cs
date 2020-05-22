@@ -1,14 +1,18 @@
 ﻿namespace StateMachine
 {
-    public abstract class TransitionBehaviour<TStateEnum, TStateMachineWorker, TEventSystem>
+    public abstract class TransitionBehaviour<TStateEnum, TStateMachineWorker, TEventConsumer>
         where TStateEnum : System.Enum
         where TStateMachineWorker : IStateMachineWorker
     {
-        protected IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventSystem> m_internalStateMachine;
+        protected TEventConsumer m_eventConsumer;
+        protected TStateMachineWorker m_worker;
+        protected IGame m_game;
 
-        public TransitionBehaviour(IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventSystem> ai_internalStateMachine)
+        public TransitionBehaviour(IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventConsumer> ai_internalStateMachine)
         {
-            m_internalStateMachine = ai_internalStateMachine;
+            m_eventConsumer = ai_internalStateMachine.GetEventConsumer();
+            m_worker = ai_internalStateMachine.GetWorker();
+            m_game = ai_internalStateMachine.GetGame();
         }
 
        /// <summary>
