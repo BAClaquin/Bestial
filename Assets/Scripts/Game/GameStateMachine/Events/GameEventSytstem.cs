@@ -10,11 +10,11 @@ namespace GameStateMachine
     /// <summary>
     /// Game event system for emiter use
     /// </summary>
-    public interface IGameEventEmiter
+    public interface IGameEventEmitter
     {
-        IDataEventEmiter<Tile> GetTileSelectedEmiter();
-        IDataEventEmiter<Unit> GetUnitSelectedEmiter();
-        IBasicEventEmiter GetMoveIsOverEmiter();
+        IDataEventEmitter<Tile> GetTileSelectedEmitter();
+        IDataEventEmitter<Unit> GetUnitSelectedEmitter();
+        IBasicEventEmitter GetMoveIsOverEmitter();
     }
 
     /// <summary>
@@ -27,7 +27,7 @@ namespace GameStateMachine
         IBaseEventConsumer MoveIsOverConsumer();
     }
 
-    public class GameEventSytstem : StateMachine.BaseEventSystem, IGameEventEmiter, IGameEventConsumer
+    public class GameEventSytstem : StateMachine.BaseEventSystem, IGameEventEmitter, IGameEventConsumer
     {
 
         private DataEvent<Tile> m_tileSelected;
@@ -51,7 +51,7 @@ namespace GameStateMachine
 
         #region Accessor for consumer and emiter
         // MOVE IS OVER
-        public IBasicEventEmiter GetMoveIsOverEmiter()
+        public IBasicEventEmitter GetMoveIsOverEmitter()
         {
             return m_moveIsOver;
         }
@@ -61,7 +61,7 @@ namespace GameStateMachine
         }
 
         // TILE SELECTED
-        public IDataEventEmiter<Tile> GetTileSelectedEmiter()
+        public IDataEventEmitter<Tile> GetTileSelectedEmitter()
         {
             return m_tileSelected;
         }
@@ -75,7 +75,7 @@ namespace GameStateMachine
         {
             return m_unitSelected;
         }
-        public IDataEventEmiter<Unit> GetUnitSelectedEmiter()
+        public IDataEventEmitter<Unit> GetUnitSelectedEmitter()
         {
             return m_unitSelected;
         }

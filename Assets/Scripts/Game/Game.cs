@@ -65,7 +65,7 @@ public class Game : MonoBehaviour,IGame
 
     private int CurrentPlayerTurn = -1;
     private bool GameIsOver = false;
-    private IStateMachine<IGameEventEmiter> m_stateMachine;
+    private IStateMachine<IGameEventEmitter> m_stateMachine;
 
     #region UI Functions
     void Start()
@@ -148,7 +148,7 @@ public class Game : MonoBehaviour,IGame
     /// <param name="ai_unit"></param>
     public void onSelectedUnit(Unit ai_unit)
     {
-        m_stateMachine.GetEventEmiter().GetUnitSelectedEmiter().Raise(ai_unit);
+        m_stateMachine.GetEventEmiter().GetUnitSelectedEmitter().Raise(ai_unit);
     }
 
     public void HighlightAccessibleTiles(Unit ai_unit)
@@ -177,7 +177,7 @@ public class Game : MonoBehaviour,IGame
     /// <param name="ai_tile"></param>
     public void onSelectedTile(Tile ai_tile)
     {
-        m_stateMachine.GetEventEmiter().GetTileSelectedEmiter().Raise(ai_tile);
+        m_stateMachine.GetEventEmiter().GetTileSelectedEmitter().Raise(ai_tile);
     }
 
 
@@ -190,7 +190,7 @@ public class Game : MonoBehaviour,IGame
     private IEnumerator moveTo(Unit m_selectedUnit, Tile ai_tile)
     {
         yield return m_selectedUnit.moveTo(CurrentMap.getComputedPathTo(ai_tile));
-        m_stateMachine.GetEventEmiter().GetMoveIsOverEmiter().Raise();
+        m_stateMachine.GetEventEmiter().GetMoveIsOverEmitter().Raise();
     }
 
     public bool UnitBelongsToCurrentPlayer(Unit m_selectedUnit)

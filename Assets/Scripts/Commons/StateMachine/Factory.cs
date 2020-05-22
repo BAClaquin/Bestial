@@ -4,13 +4,13 @@ using UnityEngine;
 
 namespace StateMachine
 {
-    public abstract class AFactory<TStateEnum, TStateMachineWorker, TEventSystem, TEventConsumer, TEventEmiter>
+    public abstract class AFactory<TStateEnum, TStateMachineWorker, TEventSystem, TEventConsumer, TEventEmitter>
         where TStateEnum : System.Enum
         where TStateMachineWorker : IStateMachineWorker, new()
-        where TEventSystem : BaseEventSystem, TEventConsumer, TEventEmiter, new()
+        where TEventSystem : BaseEventSystem, TEventConsumer, TEventEmitter, new()
     {
         #region Private Members
-        protected StateMachine<TStateEnum, TStateMachineWorker, TEventConsumer, TEventEmiter> m_stateMachine;
+        protected StateMachine<TStateEnum, TStateMachineWorker, TEventConsumer, TEventEmitter> m_stateMachine;
         Configuration<TStateEnum, TStateMachineWorker, TEventConsumer> m_config;
         TStateMachineWorker m_worker;
         IGame m_game;
@@ -23,12 +23,12 @@ namespace StateMachine
             m_worker = new TStateMachineWorker();
             m_game = ai_game;
             m_eventSystem = new TEventSystem();
-            m_stateMachine = new StateMachine<TStateEnum, TStateMachineWorker, TEventConsumer, TEventEmiter>(m_worker, m_eventSystem, m_eventSystem, m_eventSystem, m_game);
+            m_stateMachine = new StateMachine<TStateEnum, TStateMachineWorker, TEventConsumer, TEventEmitter>(m_worker, m_eventSystem, m_eventSystem, m_eventSystem, m_game);
         }
         #endregion
 
         #region Utilitary Functions for creation
-        public IStateMachine<TEventEmiter> Create(string ai_stateMachineName)
+        public IStateMachine<TEventEmitter> Create(string ai_stateMachineName)
         {
             // create new configuration
             m_config = new Configuration<TStateEnum, TStateMachineWorker, TEventConsumer>(ai_stateMachineName);

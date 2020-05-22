@@ -83,7 +83,7 @@ namespace StateMachine
     /// <summary>
     /// For events without associated data, for Emiter
     /// </summary>
-    public interface IBasicEventEmiter
+    public interface IBasicEventEmitter
     {
         /// <summary>
         /// Raise the event
@@ -94,7 +94,7 @@ namespace StateMachine
     /// <summary>
     /// For events without associated data
     /// </summary>
-    public class BasicEvent :  BaseEventConsumer, IBasicEventEmiter, IBaseEventConsumer
+    public class BasicEvent :  BaseEventConsumer, IBasicEventEmitter, IBaseEventConsumer
     {
         /// <summary>
         /// Raise the event
@@ -113,7 +113,7 @@ namespace StateMachine
     /// For data event from external POV
     /// </summary>
     /// <typeparam name="TAssociatedData"></typeparam>
-    public interface IDataEventEmiter<TAssociatedData>
+    public interface IDataEventEmitter<TAssociatedData>
     {
         /// <summary>
         /// Raise the event as it occured
@@ -145,7 +145,7 @@ namespace StateMachine
     /// For events with an associated data
     /// </summary>
     /// <typeparam name="TAssociatedData"></typeparam>
-    public class DataEvent<TAssociatedData> : BaseEventConsumer, IDataEventEmiter<TAssociatedData>, IDataEventConsumer<TAssociatedData>
+    public class DataEvent<TAssociatedData> : BaseEventConsumer, IDataEventEmitter<TAssociatedData>, IDataEventConsumer<TAssociatedData>
     {
         /// <summary>
         /// Data associated with the event

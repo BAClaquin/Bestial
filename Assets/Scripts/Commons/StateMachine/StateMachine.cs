@@ -108,7 +108,7 @@ namespace StateMachine
         /// <summary>
         /// Event system for the state machine : for consumer
         /// </summary>
-        TEventEmiter m_eventEmiter;
+        TEventEmiter m_eventEmitter;
 
         /// <summary>
         /// Base event system to consume all events
@@ -127,12 +127,12 @@ namespace StateMachine
         /// </summary>
         /// <param name="ai_configuration">COndigfuration of states and transitions</param>
         /// <param name="ai_worker">External worker the state machine can work with</param>
-        public StateMachine(TStateMachineWorker ai_worker, BaseEventSystem ai_eventSystem, TEventConsumer ai__eventConsumer,  TEventEmiter ai_eventEmiter, IGame ai_game)
+        public StateMachine(TStateMachineWorker ai_worker, BaseEventSystem ai_eventSystem, TEventConsumer ai__eventConsumer,  TEventEmiter ai_eventEmitter, IGame ai_game)
         {
             m_isStarted = false;
             m_worker = ai_worker;
             m_eventConsumer = ai__eventConsumer;
-            m_eventEmiter = ai_eventEmiter;
+            m_eventEmitter = ai_eventEmitter;
             m_eventSystem = ai_eventSystem;
             m_game = ai_game;
         }
@@ -285,7 +285,7 @@ namespace StateMachine
         /// <returns></returns>
         public  TEventEmiter GetEventEmiter()
         {
-            return m_eventEmiter;
+            return m_eventEmitter;
         }
 
         public TStateMachineWorker GetWorker()
