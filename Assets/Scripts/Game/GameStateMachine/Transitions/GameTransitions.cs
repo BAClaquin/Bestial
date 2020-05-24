@@ -7,8 +7,8 @@ using UnityEngine;
 
 namespace GameStateMachine
 {
-    using IInternalStateMachine = StateMachine.IInternalStateMachine<GameStates, GameWorker, GameEventSytstem>;
-    using GameTransitionBehaviour = StateMachine.TransitionBehaviour<GameStates, GameWorker, GameEventSytstem>;
+    using IInternalStateMachine = StateMachine.IInternalStateMachine<GameStates, GameWorker, IGameEventConsumer>;
+    using GameTransitionBehaviour = StateMachine.TransitionBehaviour<GameStates, GameWorker, IGameEventConsumer>;
 
     namespace TransitionBehaviours
     {
@@ -22,12 +22,12 @@ namespace GameStateMachine
             public Event_AnyUnitSelected(IInternalStateMachine ai_internalStateMachine) : base(ai_internalStateMachine) { }
             public override bool EvaluateCondition()
             {
-                return Utils.eventOccured(m_internalStateMachine, EventEnum.UNIT_SELECTED);
+                return m_eventConsumer.UnitSelectedConsumer().HasOccured();
             }
 
             public override void ConsumeAndStore()
             {
-                m_internalStateMachine.GetWorker().LastSelectedUnit = m_internalStateMachine.GetEventSystem().ConsumeUnitSelectedEvent();
+                m_worker.LastSelectedUnit = m_eventConsumer.UnitSelectedConsumer().ConsumeAssociatedData();
             }
         }
 
@@ -39,25 +39,25 @@ namespace GameStateMachine
             public Event_SelectedPlayerUnit(IInternalStateMachine ai_internalStateMachine) : base(ai_internalStateMachine) { }
             public override bool EvaluateCondition()
             {
-                if(Utils.eventOccured(m_internalStateMachine, EventEnum.UNIT_SELECTED))
+                if(m_eventConsumer.UnitSelectedConsumer().HasOccured())
                 {
-                    var unit = m_internalStateMachine.GetEventSystem().GetUnitSelectedData();
-                    return m_internalStateMachine.GetGame().UnitBelongsToCurrentPlayer(unit);
+                    var unit = m_eventConsumer.UnitSelectedConsumer().GetAssociatedData();
+                    return m_game.UnitBelongsToCurrentPlayer(unit);
                 }
                 return false;
             }
 
             public override void ConsumeAndStore()
             {
-                m_internalStateMachine.GetWorker().LastSelectedUnit = m_internalStateMachine.GetEventSystem().ConsumeUnitSelectedEvent();
+                m_worker.LastSelectedUnit = m_eventConsumer.UnitSelectedConsumer().ConsumeAssociatedData();
             }
 
             public override void OnTransitionAction()
             {
                 // if current unit has consumed some of its actions when leaving : disable it
-                if(m_internalStateMachine.GetWorker().CurrentUnit.HasConsumedActions())
+                if(m_worker.CurrentUnit.HasConsumedActions())
                 {
-                    m_internalStateMachine.GetWorker().CurrentUnit.Disable();
+                    m_worker.CurrentUnit.Disable();
                 }
             }
         }
@@ -71,10 +71,10 @@ namespace GameStateMachine
 
             public override bool EvaluateCondition()
             {
-                if (Utils.eventOccured(m_internalStateMachine, EventEnum.UNIT_SELECTED))
+                if (m_eventConsumer.UnitSelectedConsumer().HasOccured())
                 {
-                    var unit = m_internalStateMachine.GetEventSystem().GetUnitSelectedData();
-                    if( Utils.CanUnitAttack(m_internalStateMachine, m_internalStateMachine.GetWorker().CurrentUnit, unit) )
+                    var unit = m_eventConsumer.UnitSelectedConsumer().GetAssociatedData();
+                    if( Utils.CanUnitAttack(m_game, m_worker.CurrentUnit, unit) )
                     {
                         return true;
                     }
@@ -85,7 +85,7 @@ namespace GameStateMachine
 
             public override void ConsumeAndStore()
             {
-                m_internalStateMachine.GetWorker().LastSelectedUnit = m_internalStateMachine.GetEventSystem().ConsumeUnitSelectedEvent();
+                m_worker.LastSelectedUnit = m_eventConsumer.UnitSelectedConsumer().ConsumeAssociatedData();
             }
         }
 
@@ -97,13 +97,13 @@ namespace GameStateMachine
             public Guard_SelectedUnitIsPlayable(IInternalStateMachine ai_internalStateMachine) : base(ai_internalStateMachine) { }
             public override bool EvaluateCondition()
             {
-                return m_internalStateMachine.GetGame().UnitIsPlayable(m_internalStateMachine.GetWorker().LastSelectedUnit);
+                return m_game.UnitIsPlayable(m_worker.LastSelectedUnit);
             }
 
             public override void OnTransitionAction()
             {
                 // set the semected unit as current one
-                m_internalStateMachine.GetWorker().SelectCurrentUnit(m_internalStateMachine.GetWorker().LastSelectedUnit);
+                m_worker.SelectCurrentUnit(m_worker.LastSelectedUnit);
             }
         }
 
@@ -115,7 +115,7 @@ namespace GameStateMachine
             public Guard_SelectedUnitIsNotPlayable(IInternalStateMachine ai_internalStateMachine) : base(ai_internalStateMachine) { }
             public override bool EvaluateCondition()
             {
-                return ! m_internalStateMachine.GetGame().UnitIsPlayable(m_internalStateMachine.GetWorker().LastSelectedUnit);
+                return ! m_game.UnitIsPlayable(m_worker.LastSelectedUnit);
             }
         }
 
@@ -127,13 +127,13 @@ namespace GameStateMachine
             public Guard_CurrentUnitIsNotPlayable(IInternalStateMachine ai_internalStateMachine) : base(ai_internalStateMachine) { }
             public override bool EvaluateCondition()
             {
-                return !m_internalStateMachine.GetGame().UnitIsPlayable(m_internalStateMachine.GetWorker().CurrentUnit);
+                return !m_game.UnitIsPlayable(m_worker.CurrentUnit);
             }
 
             // when unit is not playable disable it
             public override void OnTransitionAction()
             {
-                m_internalStateMachine.GetWorker().CurrentUnit.Disable();
+                m_worker.CurrentUnit.Disable();
             }
         }
         #endregion
@@ -147,12 +147,12 @@ namespace GameStateMachine
             public Event_AccessibleTileSelected(IInternalStateMachine ai_internalStateMachine) : base(ai_internalStateMachine) { }
             public override bool EvaluateCondition()
             {
-                if( Utils.eventOccured(m_internalStateMachine, EventEnum.TILE_SELECTED) )
+                if (m_eventConsumer.TileSelectedConsumer().HasOccured())
                 {
                     // get info about event tile
-                    var w_tile = m_internalStateMachine.GetEventSystem().GetTileSelectedData();
+                    var w_tile = m_eventConsumer.TileSelectedConsumer().GetAssociatedData();
                     // if the unit can move to this tile
-                    return Utils.CurrentUnitCanMoveTo(m_internalStateMachine, w_tile);
+                    return m_game.UnitCanMoveToTile(m_worker.CurrentUnit, w_tile);
                 }
 
                 return false;
@@ -160,7 +160,7 @@ namespace GameStateMachine
 
             public override void ConsumeAndStore()
             {
-                m_internalStateMachine.GetWorker().LastSelectedTile = m_internalStateMachine.GetEventSystem().ConsumeTileSelectedEvent();
+                m_worker.LastSelectedTile = m_eventConsumer.TileSelectedConsumer().ConsumeAssociatedData();
             }
         }
         #endregion
@@ -174,12 +174,12 @@ namespace GameStateMachine
             public Event_MoveIsOver(IInternalStateMachine ai_internalStateMachine) : base(ai_internalStateMachine) { }
             public override bool EvaluateCondition()
             {
-                return Utils.eventOccured(m_internalStateMachine, EventEnum.MOVE_IS_OVER);
+                return m_eventConsumer.MoveIsOverConsumer().HasOccured();
             }
 
             public override void ConsumeAndStore()
             {
-                m_internalStateMachine.GetEventSystem().ConsumeMoveOver();
+                m_eventConsumer.MoveIsOverConsumer().Consume(); ;
             }
         }
         #endregion

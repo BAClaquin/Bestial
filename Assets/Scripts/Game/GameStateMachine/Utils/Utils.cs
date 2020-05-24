@@ -9,28 +9,16 @@ using System.Threading.Tasks;
 namespace GameStateMachine
 {
 
-    using IInternalStateMachine = IInternalStateMachine<GameStates, GameWorker, GameEventSytstem>;
+    using IInternalStateMachine = IInternalStateMachine<GameStates, GameWorker, IGameEventConsumer>;
 
     public class Utils
     {
-        public static bool CurrentUnitCanMoveTo(IInternalStateMachine ai_internalStateMachine, Tile ai_tile)
-        {
-            // unit can move and tile is in reach of unit
-            var w_unit = ai_internalStateMachine.GetWorker().CurrentUnit;
-            return ai_internalStateMachine.GetGame().UnitCanMoveToTile(w_unit, ai_tile);
-        }
 
-
-        public static bool eventOccured(IInternalStateMachine ai_internalStateMachine, EventEnum ai_event)
-        {
-            return ai_internalStateMachine.GetEventSystem().HasEventOccured(ai_event);
-        }
-
-        public static bool CanUnitAttack(IInternalStateMachine ai_internalStateMachine, Unit ai_attacker, Unit ai_attackee)
+        public static bool CanUnitAttack(IGame ai_game, Unit ai_attacker, Unit ai_attackee)
         {
             if(ai_attacker.CanAttack())
             {
-                return ai_internalStateMachine.GetGame().UnitIsAttackableByUnit(ai_attacker, ai_attackee);
+                return ai_game.UnitIsAttackableByUnit(ai_attacker, ai_attackee);
             }
             return false;
         }

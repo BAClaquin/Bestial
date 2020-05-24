@@ -10,11 +10,11 @@ namespace StateMachine
 {
 
     // Operation that can be called during a state
-    public delegate void StateOperationDelegate<TStateEnum, TStateMachineWorker, TEventSystem>(IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventSystem> ai_internalStateMachine)
+    public delegate void StateOperationDelegate<TStateEnum, TStateMachineWorker, TEventConsumer>(IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventConsumer> ai_internalStateMachine)
         where TStateEnum : System.Enum
         where TStateMachineWorker : IStateMachineWorker;
 
-    public abstract class State<TStateEnum, TStateMachineWorker, TEventSystem>
+    public abstract class State<TStateEnum, TStateMachineWorker, TEventConsumer>
         where TStateEnum : System.Enum
         where TStateMachineWorker : IStateMachineWorker
     {
@@ -24,7 +24,7 @@ namespace StateMachine
 
 
         #region Private Members
-        protected IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventSystem> m_internalStateMachine;
+        protected IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventConsumer> m_internalStateMachine;
         #endregion
 
         #region Constructors
@@ -32,7 +32,7 @@ namespace StateMachine
         /// Constructor for Abstract State
         /// </summary>
         /// <param name="ai_id">ID of the state</param>
-        public State(TStateEnum ai_id, StateMachine<TStateEnum, TStateMachineWorker, TEventSystem> ai_stateMachine)
+        public State(TStateEnum ai_id, IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventConsumer> ai_stateMachine)
         {
             ID = ai_id;
             m_internalStateMachine = ai_stateMachine;
@@ -46,7 +46,7 @@ namespace StateMachine
 
         #region Public 
 
-        public void SetStateMachine(IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventSystem> ai_stateMachine)
+        public void SetStateMachine(IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventConsumer> ai_stateMachine)
         {
             m_internalStateMachine = ai_stateMachine;
         }
@@ -56,7 +56,7 @@ namespace StateMachine
         /// </summary>
         /// <param name="ai_other">other state to compare to</param>
         /// <returns>True if same ID, false otherwise</returns>
-        public bool IsSameState(State<TStateEnum, TStateMachineWorker, TEventSystem> ai_other)
+        public bool IsSameState(State<TStateEnum, TStateMachineWorker, TEventConsumer> ai_other)
         {
             return ID.Equals(ai_other.ID);
         }
@@ -103,7 +103,7 @@ namespace StateMachine
         /// TODO : a la construction ????
         /// </summary>
         /// <param name="ai_internalStateMachine"></param>
-        public void SetInternalStateMachine(IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventSystem>  ai_internalStateMachine)
+        public void SetInternalStateMachine(IInternalStateMachine<TStateEnum, TStateMachineWorker, TEventConsumer>  ai_internalStateMachine)
         {
             this.m_internalStateMachine = ai_internalStateMachine;
         }

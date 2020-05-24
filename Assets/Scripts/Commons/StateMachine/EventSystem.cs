@@ -5,80 +5,212 @@ using UnityEngine;
 
 namespace StateMachine
 {
-    public class EventBase<TEventEnum>
-        where TEventEnum : System.Enum
-    {
-        public TEventEnum ID { get; private set; }
-        public bool Consumed { get; private set; }
 
-        public EventBase(TEventEnum ai_ID)
+    #region BaseEvent
+    /// <summary>
+    /// Base event for all events from a consumer POV
+    /// </summary>
+    public interface IBaseEventConsumer
+    {
+        /// <summary>
+        /// Consumes the event : it will no longer be stated as occured
+        /// </summary>
+        void Consume();
+
+        /// <summary>
+        /// Rejects the event : 
+        /// Foprce to not occured.
+        /// </summary>
+        void Reject();
+
+        /// <summary>
+        /// Indicates if event has occured
+        /// </summary>
+        /// <returns>True if has occured, false otherwise</returns>
+        bool HasOccured();
+    }
+
+    /// <summary>
+    /// Base event for all events from a consumer POV
+    /// </summary>
+    public class BaseEventConsumer : IBaseEventConsumer
+    {
+        // has the event occured
+        protected bool m_occured;
+
+        /// <summary>
+        /// Constructor for basic event
+        /// </summary>
+        public BaseEventConsumer()
         {
-            ID = ai_ID;
-            Consumed = false;
+            m_occured = false;
         }
 
-        public void ConsumeEvent()
+        /// <summary>
+        /// Consumes the event : it will no longer be stated as occured
+        /// </summary>
+        public void Consume()
         {
-            Consumed = true;
+            if (!m_occured)
+            {
+                throw new System.Exception("Trying to consume an event that has not occured");
+            }
+            m_occured = false;
+        }
+
+        /// <summary>
+        /// Force event to not occured.
+        /// </summary>
+        public void Reject()
+        {
+            m_occured = false;
+        }
+
+        /// <summary>
+        /// Indicates if event has occured
+        /// </summary>
+        /// <returns>True if has occured, false otherwise</returns>
+        public bool HasOccured()
+        {
+            return m_occured;
         }
     }
 
-    public class Event<TEventEnum,TAssociatedData> : EventBase<TEventEnum>
-        where TEventEnum : System.Enum
+    #endregion
+
+    #region NoDataEvent
+
+    /// <summary>
+    /// For events without associated data, for Emiter
+    /// </summary>
+    public interface IBasicEventEmitter
     {
+        /// <summary>
+        /// Raise the event
+        /// </summary>
+        void Raise(); 
+    }
+
+    /// <summary>
+    /// For events without associated data
+    /// </summary>
+    public class BasicEvent :  BaseEventConsumer, IBasicEventEmitter, IBaseEventConsumer
+    {
+        /// <summary>
+        /// Raise the event
+        /// </summary>
+        public void Raise()
+        {
+            m_occured = true;
+        }
+    }
+
+    #endregion
+
+    #region DataEvent
+
+    /// <summary>
+    /// For data event from external POV
+    /// </summary>
+    /// <typeparam name="TAssociatedData"></typeparam>
+    public interface IDataEventEmitter<TAssociatedData>
+    {
+        /// <summary>
+        /// Raise the event as it occured
+        /// </summary>
+        /// <param name="ai_data">Data associated with your event</param>
+        void Raise(TAssociatedData ai_data);
+    }
+
+    /// <summary>
+    /// To raise events with an associated data
+    /// </summary>
+    /// <typeparam name="TAssociatedData"></typeparam>
+    public interface IDataEventConsumer<TAssociatedData> : IBaseEventConsumer
+    {
+        /// <summary>
+        /// Provides the data associated with the event
+        /// </summary>
+        /// <returns></returns>
+        TAssociatedData GetAssociatedData();
+
+        /// <summary>
+        /// Provides the data associated with the event and consumes it
+        /// </summary>
+        /// <returns>Data associated with the event</returns>
+        TAssociatedData ConsumeAssociatedData();
+    }
+
+    /// <summary>
+    /// For events with an associated data
+    /// </summary>
+    /// <typeparam name="TAssociatedData"></typeparam>
+    public class DataEvent<TAssociatedData> : BaseEventConsumer, IDataEventEmitter<TAssociatedData>, IDataEventConsumer<TAssociatedData>
+    {
+        /// <summary>
+        /// Data associated with the event
+        /// </summary>
         private TAssociatedData m_data;
 
-        public Event(TEventEnum ai_id, TAssociatedData ai_data) : base(ai_id)
+        /// <summary>
+        /// Raise the event as it occured
+        /// </summary>
+        /// <param name="ai_data">Data associated with your event</param>
+        public void Raise(TAssociatedData ai_data)
         {
             m_data = ai_data;
+            m_occured = true;
         }
 
-        public TAssociatedData getAssociatedData()
+        /// <summary>
+        /// Provides the data associated with the event
+        /// </summary>
+        /// <returns></returns>
+        public TAssociatedData GetAssociatedData()
         {
+            if ( ! m_occured)
+            {
+                throw new System.Exception("Trying to getData for an event that has not occured");
+            }
+            return m_data;
+        }
+
+        /// <summary>
+        /// Provides the data associated with the event and consumes event
+        /// </summary>
+        /// <returns></returns>
+        public TAssociatedData ConsumeAssociatedData()
+        {
+            Consume();
             return m_data;
         }
     }
 
-    /// <summary>
-    /// Base class to use for single event system
-    /// </summary>
-    /// <typeparam name="TEventEnum">Enum of events managed by this class</typeparam>
-    public abstract class SingleEventSystem<TEventEnum>
-    where TEventEnum : System.Enum
-    {
-        #region Private Members
-        EventBase<TEventEnum> m_lastRaisedEvent;
-        #endregion
+    #endregion
 
+    #region EventSystem
+    public class BaseEventSystem
+    {
         /// <summary>
-        /// This function should be call by enhariting class to indicate event received has been raised
+        /// List for all possible events that can occur;
         /// </summary>
-        /// <param name="ai_eventID">Event base to raise</param>
-        protected void RaiseEvent(EventBase<TEventEnum> ai_eventBase)
+        protected List<IBaseEventConsumer> m_possibleEvents;
+
+        protected BaseEventSystem()
         {
-            m_lastRaisedEvent = ai_eventBase;
+            m_possibleEvents = new List<IBaseEventConsumer>();
         }
 
         /// <summary>
-        /// This function should be call by enhariting class to indicate event has been consumed
+        /// Consumes all events
         /// </summary>
-        /// <param name="ai_eventBase"></param>
-        protected void ConsumeEvent(EventBase<TEventEnum> ai_eventBase)
+        public void RejectAllEvents()
         {
-            if(m_lastRaisedEvent.ID.Equals(ai_eventBase.ID))
+            foreach (var w_event in m_possibleEvents)
             {
-                m_lastRaisedEvent.ConsumeEvent();
+                w_event.Reject();
             }
         }
-
-        /// <summary>
-        /// Tells if an event has occured and hasn't been consumed
-        /// </summary>
-        /// <param name="ai_eventID">ID of the event you ask if it's been raised</param>
-        /// <returns>true if occured and not comnsumed, false otherwise</returns>
-        public bool HasEventOccured(TEventEnum ai_eventID)
-        {
-            return m_lastRaisedEvent == null ? false : (m_lastRaisedEvent.ID.Equals(ai_eventID) && !m_lastRaisedEvent.Consumed);
-        }
     }
+    #endregion
 }

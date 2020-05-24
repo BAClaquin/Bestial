@@ -6,7 +6,7 @@ using UnityEngine;
 namespace StateMachine
 {
 
-    public class Configuration<TStateEnum, TStateMachineWorker,TEventSystem>
+    public class Configuration<TStateEnum, TStateMachineWorker,TEventConsumer>
         where TStateEnum : System.Enum
         where TStateMachineWorker : IStateMachineWorker
     {
@@ -21,17 +21,16 @@ namespace StateMachine
         /// <summary>
         /// List of states
         /// </summary>
-        private List<State<TStateEnum, TStateMachineWorker, TEventSystem>> m_states;
+        private List<State<TStateEnum, TStateMachineWorker, TEventConsumer>> m_states;
         /// <summary>
         /// List of states
         /// </summary>
-        private List<Transition<TStateEnum, TStateMachineWorker, TEventSystem>> m_transitions;
+        private List<Transition<TStateEnum, TStateMachineWorker, TEventConsumer>> m_transitions;
         /// <summary>
         /// First state when statemachine is started
         /// </summary>
-        State<TStateEnum, TStateMachineWorker, TEventSystem> m_startState;
+        State<TStateEnum, TStateMachineWorker, TEventConsumer> m_startState;
         #endregion
-
 
         #region Constructors
         /// <summary>
@@ -41,8 +40,8 @@ namespace StateMachine
         public Configuration(string ai_stateMachineName)
         {
             StateMachineName = ai_stateMachineName;
-            m_states = new List<State<TStateEnum, TStateMachineWorker, TEventSystem>>();
-            m_transitions = new List<Transition<TStateEnum, TStateMachineWorker, TEventSystem>>();
+            m_states = new List<State<TStateEnum, TStateMachineWorker, TEventConsumer>>();
+            m_transitions = new List<Transition<TStateEnum, TStateMachineWorker, TEventConsumer>>();
         }
         #endregion
 
@@ -52,7 +51,7 @@ namespace StateMachine
         /// </summary>
         /// <param name="ai_state">State to add</param>
         /// <returns> The state juste added </returns>
-        public State<TStateEnum, TStateMachineWorker, TEventSystem> addState(State<TStateEnum, TStateMachineWorker, TEventSystem> ai_state, bool ai_isStartState = false)
+        public State<TStateEnum, TStateMachineWorker, TEventConsumer> addState(State<TStateEnum, TStateMachineWorker, TEventConsumer> ai_state, bool ai_isStartState = false)
         {
             // check if states isn't already here
             foreach (var state in m_states)
@@ -83,7 +82,7 @@ namespace StateMachine
         /// Adds a transition to the list of possible transitions
         /// </summary>
         /// <param name="ai_transition">Transition to add</param>
-        public Transition<TStateEnum, TStateMachineWorker, TEventSystem> addTransition(Transition<TStateEnum, TStateMachineWorker, TEventSystem> ai_transition)
+        public Transition<TStateEnum, TStateMachineWorker, TEventConsumer> addTransition(Transition<TStateEnum, TStateMachineWorker, TEventConsumer> ai_transition)
         {
             // check if states isn't already here
             foreach (var transition in m_transitions)
@@ -103,7 +102,7 @@ namespace StateMachine
         /// Provides the start state
         /// </summary>
         /// <returns>state</returns>
-        public State<TStateEnum, TStateMachineWorker, TEventSystem> getStartState()
+        public State<TStateEnum, TStateMachineWorker, TEventConsumer> getStartState()
         {
             if (m_startState == null)
             {
@@ -133,9 +132,9 @@ namespace StateMachine
         /// </summary>
         /// <param name="ai_state">The state you want tto start from</param>
         /// <returns>All transitions found</returns>
-        public List<Transition<TStateEnum, TStateMachineWorker, TEventSystem>> getAllTransitionsFrom(State<TStateEnum, TStateMachineWorker, TEventSystem> ai_state)
+        public List<Transition<TStateEnum, TStateMachineWorker, TEventConsumer>> getAllTransitionsFrom(State<TStateEnum, TStateMachineWorker, TEventConsumer> ai_state)
         {
-            List<Transition<TStateEnum, TStateMachineWorker, TEventSystem>> w_result = new List<Transition<TStateEnum, TStateMachineWorker, TEventSystem>>();
+            List<Transition<TStateEnum, TStateMachineWorker, TEventConsumer>> w_result = new List<Transition<TStateEnum, TStateMachineWorker, TEventConsumer>>();
 
             // browse all transitions
             foreach (var transition in m_transitions)
@@ -155,7 +154,7 @@ namespace StateMachine
         /// </summary>
         /// <param name="ai_id">ID you look for</param>
         /// <returns>Foudn result</returns>
-        public State<TStateEnum, TStateMachineWorker, TEventSystem> getStateByID(TStateEnum ai_id)
+        public State<TStateEnum, TStateMachineWorker, TEventConsumer> getStateByID(TStateEnum ai_id)
         {
             foreach (var state in m_states)
             {
