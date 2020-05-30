@@ -15,6 +15,7 @@ namespace GameStateMachine
         IDataEventEmitter<Tile> GetTileSelectedEmitter();
         IDataEventEmitter<Unit> GetUnitSelectedEmitter();
         IBasicEventEmitter GetMoveIsOverEmitter();
+        IBasicEventEmitter GetNextTurnEmitter();
     }
 
     /// <summary>
@@ -25,6 +26,7 @@ namespace GameStateMachine
         IDataEventConsumer<Tile> TileSelectedConsumer();
         IDataEventConsumer<Unit> UnitSelectedConsumer();
         IBaseEventConsumer MoveIsOverConsumer();
+        IBaseEventConsumer NextTurnConsumer();
     }
 
     public class GameEventSytstem : StateMachine.BaseEventSystem, IGameEventEmitter, IGameEventConsumer
@@ -33,6 +35,7 @@ namespace GameStateMachine
         private DataEvent<Tile> m_tileSelected;
         private DataEvent<Unit> m_unitSelected;
         private BasicEvent m_moveIsOver;
+        private BasicEvent m_nextTurn;
 
         public GameEventSytstem()
         {
@@ -47,6 +50,10 @@ namespace GameStateMachine
             // moveIsOver
             m_moveIsOver = new BasicEvent();
             m_possibleEvents.Add(m_moveIsOver);
+
+            // next turn
+            m_nextTurn = new BasicEvent();
+            m_possibleEvents.Add(m_nextTurn);
         }
 
         #region Accessor for consumer and emiter
@@ -78,6 +85,16 @@ namespace GameStateMachine
         public IDataEventEmitter<Unit> GetUnitSelectedEmitter()
         {
             return m_unitSelected;
+        }
+
+        // NEXT TURN
+        public IBaseEventConsumer  NextTurnConsumer()
+        {
+            return m_nextTurn;
+        }
+        public IBasicEventEmitter GetNextTurnEmitter()
+        {
+            return m_nextTurn;
         }
         #endregion
     }

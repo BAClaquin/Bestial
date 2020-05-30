@@ -33,6 +33,10 @@ public interface IGame
     /// <param name="unit">Unit</param>
     /// <returns>True if belongs, false otherwise</returns>
     bool UnitBelongsToCurrentPlayer(Unit unit);
+    /// <summary>
+    /// Function to call when going to the next turn
+    /// </summary>
+    void ExecuteNextTurn();
 }
 
 /// <summary>
@@ -87,7 +91,7 @@ public class Game : MonoBehaviour,IGame
         m_stateMachine = factory.Create("my state machine");
         m_stateMachine.Start();
 
-        NextTurn();
+        ExecuteNextTurn();
         Tracer.Instance.Trace(TraceLevel.INFO1, "Game started !");
 
     }
@@ -104,9 +108,17 @@ public class Game : MonoBehaviour,IGame
 
     #region Public Functions
     /// <summary>
+    /// Requests a next turn that will be executed when possible
+    /// </summary>
+    public void RequestNextTurn()
+    {
+        m_stateMachine.GetEventEmiter().GetNextTurnEmitter().Raise();
+    }
+
+    /// <summary>
     /// Function to call when going to the next turn
     /// </summary>
-    public void NextTurn()
+    public void ExecuteNextTurn()
     {
         if (GameIsOver)
         {
@@ -114,8 +126,8 @@ public class Game : MonoBehaviour,IGame
         }
         else
         {
-            resetCurrentAction();
             SetNextPlayer();
+            CurrentMap.ResetAvailableMoves();
             CurrentMap.ResetUnits();
         }
     }
@@ -206,24 +218,6 @@ public class Game : MonoBehaviour,IGame
     #endregion
 
     #region Private Functions
-    /// <summary>
-    /// Resets the current action
-    /// </summary>
-    void resetCurrentAction()
-    {
-        m_actionAfterMoveMode = false;
-        if (m_selectedUnit != null)
-        {
-            // reset availability of an nit
-            m_selectedUnit.SetSelected(false);
-            // reset highlighted tiles
-            CurrentMap.ResetAvailableMoves();
-            // no unit is being selected
-            m_selectedUnit = null;
-        }
-        // else no actions to reset for the moment
-    }
-
     public bool UnitCanMoveToTile(Unit ai_unit, Tile ai_tile)
     {
         return ai_tile.isTaggedAccessible() && ai_unit.CanMove() && UnitBelongsToCurrentPlayer(ai_unit);

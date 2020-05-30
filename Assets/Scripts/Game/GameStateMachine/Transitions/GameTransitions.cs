@@ -39,7 +39,7 @@ namespace GameStateMachine
             public Event_SelectedPlayerUnit(IInternalStateMachine ai_internalStateMachine) : base(ai_internalStateMachine) { }
             public override bool EvaluateCondition()
             {
-                if(m_eventConsumer.UnitSelectedConsumer().HasOccured())
+                if (m_eventConsumer.UnitSelectedConsumer().HasOccured())
                 {
                     var unit = m_eventConsumer.UnitSelectedConsumer().GetAssociatedData();
                     return m_game.UnitBelongsToCurrentPlayer(unit);
@@ -55,7 +55,7 @@ namespace GameStateMachine
             public override void OnTransitionAction()
             {
                 // if current unit has consumed some of its actions when leaving : disable it
-                if(m_worker.CurrentUnit.HasConsumedActions())
+                if (m_worker.CurrentUnit.HasConsumedActions())
                 {
                     m_worker.CurrentUnit.Disable();
                 }
@@ -65,7 +65,7 @@ namespace GameStateMachine
         /// <summary>
         /// When an unit attackable by the CurrentUnit is selected
         /// </summary>
-        public class Event_AttackableEnnemySelected: GameTransitionBehaviour
+        public class Event_AttackableEnnemySelected : GameTransitionBehaviour
         {
             public Event_AttackableEnnemySelected(IInternalStateMachine ai_internalStateMachine) : base(ai_internalStateMachine) { }
 
@@ -74,7 +74,7 @@ namespace GameStateMachine
                 if (m_eventConsumer.UnitSelectedConsumer().HasOccured())
                 {
                     var unit = m_eventConsumer.UnitSelectedConsumer().GetAssociatedData();
-                    if( Utils.CanUnitAttack(m_game, m_worker.CurrentUnit, unit) )
+                    if (Utils.CanUnitAttack(m_game, m_worker.CurrentUnit, unit))
                     {
                         return true;
                     }
@@ -115,7 +115,7 @@ namespace GameStateMachine
             public Guard_SelectedUnitIsNotPlayable(IInternalStateMachine ai_internalStateMachine) : base(ai_internalStateMachine) { }
             public override bool EvaluateCondition()
             {
-                return ! m_game.UnitIsPlayable(m_worker.LastSelectedUnit);
+                return !m_game.UnitIsPlayable(m_worker.LastSelectedUnit);
             }
         }
 
@@ -185,6 +185,24 @@ namespace GameStateMachine
         #endregion
 
         #region general Transitions
+
+        /// <summary>
+        /// When a nextTurn is requested by the player
+        /// </summary>
+        public class Event_NextTurnRequested : GameTransitionBehaviour
+        {
+            public Event_NextTurnRequested(IInternalStateMachine ai_internalStateMachine) : base(ai_internalStateMachine) { }
+
+            public override bool EvaluateCondition()
+            {
+                return m_eventConsumer.NextTurnConsumer().HasOccured();
+            }
+
+            public override void ConsumeAndStore()
+            {
+                m_eventConsumer.NextTurnConsumer().Consume();
+            }
+        }
 
         /// <summary>
         /// Transition will always occur

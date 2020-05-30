@@ -28,7 +28,7 @@ namespace GameStateMachine
 
             AddNewState(new MoveUnit());
             AddNewState(new Attack());
-            //AddNewState(new NextTurn());
+            AddNewState(new NextTurn());
         }
 
         private void AddTransitions()
@@ -38,6 +38,7 @@ namespace GameStateMachine
             AddWaitUnitActionTransitions();
             AddMoveUnitTransitions();
             AddAttackTransitions();
+            AddNextTurnTransitions();
         }
 
         private void AddWaitGameActionTransitions()
@@ -45,6 +46,8 @@ namespace GameStateMachine
             GameStates w_baseState = GameStates.WAIT_GAME_ACTION;
             // any unit selected
             AddNewTransition(w_baseState, GameStates.UNIT_SELECTED, new TransitionBehaviours.Event_AnyUnitSelected(m_stateMachine));
+            // Next turn requested
+            AddNewTransition(w_baseState, GameStates.NEXT_TURN, new TransitionBehaviours.Event_NextTurnRequested(m_stateMachine));
         }
 
         private void AddUnitSelectedTransitions()
@@ -67,6 +70,8 @@ namespace GameStateMachine
             AddNewTransition(w_baseState, GameStates.UNIT_SELECTED, new TransitionBehaviours.Event_SelectedPlayerUnit(m_stateMachine));
             // attack an unit
             AddNewTransition(w_baseState, GameStates.ATTACK, new TransitionBehaviours.Event_AttackableEnnemySelected(m_stateMachine));
+            // Next turn requested
+            AddNewTransition(w_baseState, GameStates.NEXT_TURN, new TransitionBehaviours.Event_NextTurnRequested(m_stateMachine));
         }
 
         private void AddMoveUnitTransitions()
@@ -82,9 +87,16 @@ namespace GameStateMachine
             // automaticly after entering attack --> leave to WAITunit
             AddNewTransition(w_baseState, GameStates.WAIT_UNIT_ACTION, new TransitionBehaviours.Guard_None(m_stateMachine));
         }
+
+        private void AddNextTurnTransitions()
+        {
+            GameStates w_baseState = GameStates.NEXT_TURN;
+            // automaticly after nextTurn --> leave to WaitGameAction
+            AddNewTransition(w_baseState, GameStates.WAIT_GAME_ACTION, new TransitionBehaviours.Guard_None(m_stateMachine));
+        }
         #endregion
 
-    }
+        }
 
 }
 
