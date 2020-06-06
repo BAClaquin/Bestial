@@ -69,8 +69,8 @@ public class PathFinding
 
     public PathFinding(IPathFindingMap ai_pfMap)
     {
-        Point w_size = ai_pfMap.getSize();
-        Tile[,] w_grid = ai_pfMap.getGrid();
+        Point w_size = ai_pfMap.GetSize();
+        Tile[,] w_grid = ai_pfMap.GetGrid();
 
         m_pfMap = ai_pfMap;
         m_pfTilesGrid = new PathFindingTile[w_size.X, w_size.Y];
@@ -96,7 +96,7 @@ public class PathFinding
         resetPathFindingData();
         // mark 1st tile
         m_lastPathFound = new List<PathFindingTile>();
-        m_lastPathFound.Add(MapAt(ai_unit.getGridPosition()));
+        m_lastPathFound.Add(MapAt(ai_unit.GetGridPosition()));
         m_lastPathFound[0].setStartTile();
         // compute all accessible tiles from the start one withing the range of the unit
         // each tiles will contains shortest path to it
@@ -155,7 +155,7 @@ public class PathFinding
         foreach (PathFindingTile w_pfTileSource in aio_visitedTiles)
         {
             // look for neighbours (with range of 1)
-            List<PathFindingTile> w_neighbours = getTilesWithin(w_pfTileSource.Tile.getGridPosition(), 1);
+            List<PathFindingTile> w_neighbours = getTilesWithin(w_pfTileSource.Tile.GetGridPosition(), 1);
 
             // look for nearest not processed tile
             PathFindingTile wo_eligibleNeighbours = new PathFindingTile();
@@ -245,8 +245,8 @@ public class PathFinding
         // browse all given tiles
         foreach (PathFindingTile w_pfTile in ai_from)
         {
-            if( m_pfMap.IsPositionFree(w_pfTile.Tile.getGridPosition()) && // tile is free (no other thing on it)
-                w_pfTile.Tile.isAccessibleForUnitType(ai_unit) && // tile is accessible for this type of unit
+            if( m_pfMap.IsPositionFree(w_pfTile.Tile.GetGridPosition()) && // tile is free (no other thing on it)
+                w_pfTile.Tile.IsAccessibleForUnitType(ai_unit) && // tile is accessible for this type of unit
                 w_pfTile.Status == PathFindingStatus.NONE ) // tile has not already been processed
             {
                 if(!w_found || // new accessible tile : set as first element found
@@ -279,7 +279,7 @@ public class PathFinding
     /// <returns>True if in bounds false otherwise</returns>
     bool isInBounds(Point ai_indexPosition)
     {
-        return (ai_indexPosition.X >= 0 && ai_indexPosition.Y >= 0 && ai_indexPosition.X < m_pfMap.getSize().X && ai_indexPosition.Y < m_pfMap.getSize().Y);
+        return (ai_indexPosition.X >= 0 && ai_indexPosition.Y >= 0 && ai_indexPosition.X < m_pfMap.GetSize().X && ai_indexPosition.Y < m_pfMap.GetSize().Y);
     }
 
 

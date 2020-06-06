@@ -20,7 +20,7 @@ namespace GameStateMachine
 
         override protected void OnEnterImpl()
         {
-            m_internalStateMachine.GetGame().moveUnitToTile(m_internalStateMachine.GetWorker().CurrentUnit, m_internalStateMachine.GetWorker().LastSelectedTile);
+            m_internalStateMachine.GetGame().MoveUnitToTile(m_internalStateMachine.GetWorker().CurrentUnit, m_internalStateMachine.GetWorker().LastSelectedTile);
         }
 
     }

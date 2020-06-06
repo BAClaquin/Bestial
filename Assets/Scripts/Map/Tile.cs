@@ -53,16 +53,10 @@ public class Tile : MonoBehaviour
     #endregion
 
     #region Public Functions
-    /// <summary>
-    ///  Sets the place of the tile in the grid position
-    /// </summary>
-    /// <param name="ai_position">Position to set tile to</param>
-    public void setGridPosition(Point ai_position) { m_gridPosition = ai_position;  }
-    /// <summary>
-    /// Get the position of this tile on the grid
-    /// </summary>
-    /// <returns>Point representing this position</returns>
-    public Point getGridPosition() { return m_gridPosition; }
+
+    public void SetGridPosition(Point ai_position) { m_gridPosition = ai_position;  }
+
+    public Point GetGridPosition() { return m_gridPosition; }
     #endregion
 
     #region Game tags
@@ -78,14 +72,14 @@ public class Tile : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        retreiveSceneComponents();
-        assertUserDefinedValues();        
+        RetreiveSceneComponents();
+        AssertUserDefinedValues();        
     }
 
     /// <summary>
     /// Retreives components in the scene
     /// </summary>
-    private void retreiveSceneComponents()
+    private void RetreiveSceneComponents()
     {
         m_render = GetComponent<SpriteRenderer>();
         if (m_render == null)
@@ -101,7 +95,7 @@ public class Tile : MonoBehaviour
         }
     }
 
-    private void assertUserDefinedValues()
+    private void AssertUserDefinedValues()
     {
         // check for UnityConstruction values
         if (MovePossibleColor == null)
@@ -120,11 +114,6 @@ public class Tile : MonoBehaviour
     }
 
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
     #endregion
 
     #region UI Functions
@@ -133,7 +122,7 @@ public class Tile : MonoBehaviour
     /// </summary>
     public void OnMouseDown()
     {
-        m_game.onSelectedTile(this);
+        m_game.OnSelectedTile(this);
     }
 
     /// <summary>
@@ -151,7 +140,7 @@ public class Tile : MonoBehaviour
     public void SetAsAttackable()
     {
         m_render.color = AttackPossibleColor;
-        displayTarget();
+        DisplayTarget();
     }
 
     /// <summary>
@@ -160,7 +149,7 @@ public class Tile : MonoBehaviour
     /// </summary>
     /// <param name="ai_unit">Unit you want to know if it has access to </param>
     /// <returns>True if unit has acces to this type of tile, false otherwise</returns>
-    public bool isAccessibleForUnitType(Unit ai_unit)
+    public bool IsAccessibleForUnitType(Unit ai_unit)
     {
         // must be accessible for unit type and unit field of operation
         return AccessibleUnitType.Contains(ai_unit.UnitType) && AccessibleFieldOfOperation.Contains(ai_unit.FieldOfOperation);
@@ -173,24 +162,24 @@ public class Tile : MonoBehaviour
     {
         m_tagMovePossible = false;
         m_render.color = UnityEngine.Color.white;
-        removeTarget();
+        RemoveTarget();
     }
 
     /// <summary>
     /// Acces to move possible tag
     /// </summary>
     /// <returns>the current state of the tag</returns>
-    public bool isTaggedAccessible()
+    public bool IsTaggedAccessible()
     {
         return m_tagMovePossible;
     }
 
-    private void displayTarget()
+    private void DisplayTarget()
     {
         m_target = Instantiate(m_TargetPrefab, transform.position, Quaternion.identity);
     }
 
-    private void removeTarget()
+    private void RemoveTarget()
     {
         if(m_target != null)
         {
