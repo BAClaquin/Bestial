@@ -303,8 +303,8 @@ MonoBehaviour:
   FieldOfOperation: 0
   UnitType: 0
   MovementRange: 5
-  MoveSpeed: 7
-  SelectedUnitColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  MoveSpeed: 5
+  HighlightedColor: {r: 0.9780209, g: 1, b: 0, a: 1}
   DisabledColor: {r: 0.6603774, g: 0.6603774, b: 0.6603774, a: 1}
 --- !u!1001 &5695524840379730472
 PrefabInstance:
